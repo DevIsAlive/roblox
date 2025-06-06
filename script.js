@@ -4,30 +4,42 @@ const suggestionsDiv = document.getElementById('suggestions');
 const avatarDisplay = document.getElementById('avatar-display');
 let debounceTimer;
 let lastKeyTime = 0;
+let typingStoppedTimer;
 
 input.addEventListener('input', () => {
   const now = Date.now();
   const timeSinceLastKey = now - lastKeyTime;
   lastKeyTime = now;
 
-  // If typing too fast (less than 200ms between keystrokes), skip suggestions
-  if (timeSinceLastKey < 200) {
+  // Clear any existing timers
+  clearTimeout(debounceTimer);
+  clearTimeout(typingStoppedTimer);
+
+  const partialUsername = input.value.trim();
+  
+  if (partialUsername.length < 4) {
     suggestionsDiv.innerHTML = '';
     suggestionsDiv.classList.remove('show');
     return;
   }
 
-  clearTimeout(debounceTimer);
-  const partialUsername = input.value.trim();
-  
-  if (partialUsername.length >= 4) {
+  // If typing too fast (less than 200ms between keystrokes), skip suggestions
+  if (timeSinceLastKey < 200) {
+    suggestionsDiv.innerHTML = '';
+    suggestionsDiv.classList.remove('show');
+  } else {
+    // Show suggestions immediately if typing slows down
     debounceTimer = setTimeout(() => {
       fetchSuggestions(partialUsername);
     }, 300);
-  } else {
-    suggestionsDiv.innerHTML = '';
-    suggestionsDiv.classList.remove('show');
   }
+
+  // Set a timer to detect when typing stops completely (500ms after last keystroke)
+  typingStoppedTimer = setTimeout(() => {
+    if (partialUsername.length >= 4) {
+      fetchSuggestions(partialUsername);
+    }
+  }, 500);
 });
 
 form.addEventListener('submit', (e) => {
