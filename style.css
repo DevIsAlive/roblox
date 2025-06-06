@@ -1,0 +1,102 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 20px;
+}
+
+h1 {
+  color: #0066cc;
+  font-size: 24px;
+}
+
+form {
+  margin: 20px 0;
+}
+
+input {
+  padding: 10px;
+  width: 200px;
+  border: 2px solid #0066cc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #0055aa;
+}
+
+.suggestions {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  width: 200px;
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 10;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.suggestion {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.suggestion:hover {
+  background-color: #e6f3ff;
+}
+
+.suggestion img {
+  width: 48px;
+  height: 48px;
+  margin-right: 10px;
+  border-radius: 50%;
+}
+
+.avatar-display {
+  margin-top: 20px;
+}
+
+.avatar-display img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.error {
+  color: #cc0000;
+  font-size: 16px;
+}
+
+.loading::after {
+  content: '⏳';
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
