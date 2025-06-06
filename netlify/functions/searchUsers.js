@@ -18,7 +18,7 @@ exports.handler = async (event) => {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
       },
       body: JSON.stringify({
-        usernames: [keyword], // We can search for exact matches first
+        usernames: [keyword],
         excludeBannedUsers: true
       })
     });
@@ -28,12 +28,11 @@ exports.handler = async (event) => {
     }
 
     const data = await response.json();
-    const users = data.data.map(user => ({
+    let users = data.data.map(user => ({
       username: user.name,
       userId: user.id
     }));
 
-    // If no exact match, try a prefix search by fetching more users
     if (users.length === 0) {
       const searchResponse = await fetch('https://users.roblox.com/v1/users/search?keyword=' + encodeURIComponent(keyword) + '&limit=10', {
         method: 'GET',
@@ -48,16 +47,14 @@ exports.handler = async (event) => {
       }
 
       const searchData = await searchResponse.json();
-      const searchUsers = searchData.data.map(user => ({
+      users = searchData.data.map(user => ({
         username: user.name,
         userId: user.id
       }));
-
-      return {
-        statusCode: 200,
-        body: JSON.stringify(searchUsers)
-      };
     }
+
+    // Limit to 3 suggestions
+    users = users.slice(0, 3);
 
     return {
       statusCode: 200,
