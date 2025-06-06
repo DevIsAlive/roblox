@@ -31,6 +31,9 @@ async function fetchSuggestions(keyword) {
   suggestionsDiv.classList.add('show');
   try {
     const response = await fetch(`/.netlify/functions/searchUsers?keyword=${encodeURIComponent(keyword)}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const users = await response.json();
     if (users.length > 0) {
       const userIds = users.map(user => user.userId).join(',');
@@ -43,12 +46,12 @@ async function fetchSuggestions(keyword) {
       displaySuggestions(users, thumbnailMap);
     } else {
       suggestionsDiv.innerHTML = '<p>No suggestions found 😞</p>';
-      setTimeout(() => suggestionsDiv.classList.remove('show'), 1000); // Fade out after 1 second if no data
+      setTimeout(() => suggestionsDiv.classList.remove('show'), 1000);
     }
   } catch (error) {
     console.error('Error fetching suggestions:', error);
     suggestionsDiv.innerHTML = '<p class="error">Error loading suggestions 😔</p>';
-    setTimeout(() => suggestionsDiv.classList.remove('show'), 2000); // Fade out after 2 seconds on error
+    setTimeout(() => suggestionsDiv.classList.remove('show'), 2000);
   }
 }
 
@@ -75,10 +78,10 @@ function displaySuggestions(users, thumbnailMap) {
 }
 
 async function showAvatar(username) {
-  avatarDisplay.innerHTML = ''; // Clear content first to avoid showing loading spinner
+  avatarDisplay.innerHTML = '';
   const tempDiv = document.createElement('div');
   tempDiv.style.opacity = '0';
-  tempDiv.innerHTML = '<p>Loading your avatar...</p>'; // Temporary placeholder without spinner
+  tempDiv.innerHTML = '<p>Loading your avatar...</p>';
   avatarDisplay.appendChild(tempDiv);
 
   try {
