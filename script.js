@@ -42,12 +42,13 @@ async function fetchSuggestions(keyword) {
       });
       displaySuggestions(users, thumbnailMap);
     } else {
-      suggestionsDiv.innerHTML = '';
-      suggestionsDiv.classList.remove('show');
+      suggestionsDiv.innerHTML = '<p>No suggestions found 😞</p>';
+      setTimeout(() => suggestionsDiv.classList.remove('show'), 1000); // Fade out after 1 second if no data
     }
   } catch (error) {
     console.error('Error fetching suggestions:', error);
     suggestionsDiv.innerHTML = '<p class="error">Error loading suggestions 😔</p>';
+    setTimeout(() => suggestionsDiv.classList.remove('show'), 2000); // Fade out after 2 seconds on error
   }
 }
 
@@ -74,8 +75,13 @@ function displaySuggestions(users, thumbnailMap) {
 }
 
 async function showAvatar(username) {
+  avatarDisplay.innerHTML = ''; // Clear content first to avoid showing loading spinner
+  const tempDiv = document.createElement('div');
+  tempDiv.style.opacity = '0';
+  tempDiv.innerHTML = '<p>Loading your avatar...</p>'; // Temporary placeholder without spinner
+  avatarDisplay.appendChild(tempDiv);
+
   try {
-    avatarDisplay.innerHTML = '<p class="loading">Loading your avatar...</p>';
     const response = await fetch(`/.netlify/functions/getUserId?username=${encodeURIComponent(username)}`);
     const data = await response.json();
     if (data.error) {
