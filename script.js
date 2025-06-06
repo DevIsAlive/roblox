@@ -6,15 +6,16 @@ let debounceTimer;
 
 input.addEventListener('input', () => {
   clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(() => {
-    const partialUsername = input.value.trim();
-    if (partialUsername.length >= 3) {
+  const partialUsername = input.value.trim();
+  
+  if (partialUsername.length >= 4) {
+    debounceTimer = setTimeout(() => {
       fetchSuggestions(partialUsername);
-    } else {
-      suggestionsDiv.innerHTML = '';
-      suggestionsDiv.style.display = 'none';
-    }
-  }, 300);
+    }, 300);
+  } else {
+    suggestionsDiv.innerHTML = '';
+    suggestionsDiv.classList.remove('show');
+  }
 });
 
 form.addEventListener('submit', (e) => {
@@ -26,6 +27,8 @@ form.addEventListener('submit', (e) => {
 });
 
 async function fetchSuggestions(keyword) {
+  suggestionsDiv.innerHTML = '<p class="loading">Loading suggestions...</p>';
+  suggestionsDiv.classList.add('show');
   try {
     const response = await fetch(`/.netlify/functions/searchUsers?keyword=${encodeURIComponent(keyword)}`);
     const users = await response.json();
@@ -40,12 +43,11 @@ async function fetchSuggestions(keyword) {
       displaySuggestions(users, thumbnailMap);
     } else {
       suggestionsDiv.innerHTML = '';
-      suggestionsDiv.style.display = 'none';
+      suggestionsDiv.classList.remove('show');
     }
   } catch (error) {
     console.error('Error fetching suggestions:', error);
     suggestionsDiv.innerHTML = '<p class="error">Error loading suggestions 😔</p>';
-    suggestionsDiv.style.display = 'block';
   }
 }
 
@@ -64,12 +66,11 @@ function displaySuggestions(users, thumbnailMap) {
     div.addEventListener('click', () => {
       input.value = user.username;
       suggestionsDiv.innerHTML = '';
-      suggestionsDiv.style.display = 'none';
+      suggestionsDiv.classList.remove('show');
       showAvatar(user.username);
     });
     suggestionsDiv.appendChild(div);
   });
-  suggestionsDiv.style.display = 'block';
 }
 
 async function showAvatar(username) {

@@ -44,11 +44,18 @@ button:hover {
   width: 200px;
   max-height: 200px;
   overflow-y: auto;
-  display: none;
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   z-index: 10;
   left: 50%;
   transform: translateX(-50%);
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+.suggestions.show {
+  visibility: visible;
+  opacity: 1;
 }
 
 .suggestion {
@@ -59,14 +66,31 @@ button:hover {
 }
 
 .suggestion:hover {
-  background-color: #e6f3ff;
+  background-color: #f0f0f0;
 }
 
 .suggestion img {
-  width: 48px;
-  height: 48px;
+  width: 24px;
+  height: 24px;
   margin-right: 10px;
-  border-radius: 50%;
+}
+
+.loading {
+  text-align: center;
+  color: #666;
+  margin: 10px 0;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error {
+  text-align: center;
+  color: red;
+  margin: 10px 0;
 }
 
 .avatar-display {
@@ -83,20 +107,4 @@ button:hover {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
-}
-
-.error {
-  color: #cc0000;
-  font-size: 16px;
-}
-
-.loading::after {
-  content: '⏳';
-  display: inline-block;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }
