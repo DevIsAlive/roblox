@@ -122,6 +122,19 @@ input.addEventListener('input', () => {
 
   // Start spinning animation immediately
   if (!suggestionsDiv.querySelector('.carousel-container')) {
+    // Reduce notifications to 3 when spinning starts
+    const currentNotifications = notificationsContainer.children;
+    if (currentNotifications.length > 3) {
+      for (let i = 3; i < currentNotifications.length; i++) {
+        const notificationToRemove = currentNotifications[i];
+        notificationToRemove.classList.add('fade-out');
+        notificationToRemove.addEventListener('animationend', () => {
+          notificationToRemove.remove();
+          updateNotificationPositions();
+        }, { once: true });
+      }
+    }
+
     const grayItems = Array(40).fill(null).map(() => {
       const img = document.createElement('img');
       img.src = getRandomHeadshot();
