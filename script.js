@@ -3,6 +3,7 @@ const form = document.getElementById('username-form');
 const suggestionsDiv = document.getElementById('suggestions');
 const avatarDisplay = document.getElementById('avatar-display');
 let typingStoppedTimer;
+let hasMovedDown = false;
 
 input.addEventListener('input', () => {
   clearTimeout(typingStoppedTimer);
@@ -14,7 +15,12 @@ input.addEventListener('input', () => {
     return;
   }
 
-  // Show suggestions only after 500ms of inactivity
+  // Move the form down when second character is entered
+  if (!hasMovedDown) {
+    form.classList.add('suggestions-active');
+    hasMovedDown = true;
+  }
+
   typingStoppedTimer = setTimeout(() => {
     fetchSuggestions(partialUsername);
   }, 500);
@@ -22,11 +28,12 @@ input.addEventListener('input', () => {
 
 input.addEventListener('focus', () => {
   if (input.value.trim().length >= 2) {
-    suggestionsDiv.classList.add('show');
+    form.classList.add('suggestions-active');
   }
 });
 
 input.addEventListener('blur', () => {
+  // Don't remove suggestions-active class on blur
   setTimeout(() => {
     suggestionsDiv.classList.remove('show');
   }, 200);
@@ -36,8 +43,6 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
   const username = input.value.trim();
   if (username) {
-    // Hide suggestions when "Show Avatar" button is clicked
-    suggestionsDiv.innerHTML = '';
     suggestionsDiv.classList.remove('show');
     showAvatar(username);
   }
