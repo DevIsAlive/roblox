@@ -70,10 +70,9 @@ function displaySuggestions(users, thumbnailMap) {
     div.appendChild(img);
     div.appendChild(span);
     div.addEventListener('click', () => {
-      input.value = user.username;
       suggestionsDiv.innerHTML = '';
       suggestionsDiv.classList.remove('show');
-      showAvatar(user.username);
+      showAvatar(user.username); // Directly show the avatar
     });
     suggestionsDiv.appendChild(div);
   });
