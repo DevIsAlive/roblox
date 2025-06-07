@@ -114,7 +114,7 @@ button:hover {
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: row;
-  gap: 40px;
+  gap: 60px;
   background: none;
   box-shadow: none;
   border: none;
@@ -134,9 +134,9 @@ button:hover {
   align-items: center;
   background: none;
   border-radius: 20px;
-  padding: 32px 40px 24px 40px;
-  min-width: 180px;
-  min-height: 180px;
+  padding: 40px;
+  min-width: 240px;
+  min-height: 240px;
   cursor: pointer;
   opacity: 0;
   transform: translateY(20px);
@@ -151,22 +151,21 @@ button:hover {
 }
 
 .suggestion img {
-  width: 100px;
-  height: 100px;
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
-  margin-bottom: 16px;
   background: #e3f0ff;
   object-fit: cover;
-  box-shadow: 0 0 20px rgba(33, 150, 243, 0.3),
-              0 0 40px rgba(33, 150, 243, 0.2),
-              0 0 60px rgba(33, 150, 243, 0.1);
+  box-shadow: 0 0 30px rgba(33, 150, 243, 0.3),
+              0 0 60px rgba(33, 150, 243, 0.2),
+              0 0 90px rgba(33, 150, 243, 0.1);
   transition: box-shadow 0.3s ease;
 }
 
 .suggestion:hover img {
-  box-shadow: 0 0 30px rgba(33, 150, 243, 0.4),
-              0 0 60px rgba(33, 150, 243, 0.3),
-              0 0 90px rgba(33, 150, 243, 0.2);
+  box-shadow: 0 0 40px rgba(33, 150, 243, 0.4),
+              0 0 80px rgba(33, 150, 243, 0.3),
+              0 0 120px rgba(33, 150, 243, 0.2);
 }
 
 .suggestion .username {

@@ -98,11 +98,7 @@ function renderSuggestions(suggestions) {
     const img = document.createElement('img');
     img.src = suggestion.thumbnail || suggestion.image || 'https://www.roblox.com/headshot-thumbnail/image?userId=' + suggestion.userId + '&width=150&height=150&format=png';
     img.alt = suggestion.username;
-    const username = document.createElement('div');
-    username.className = 'username';
-    username.textContent = suggestion.username;
     div.appendChild(img);
-    div.appendChild(username);
     div.onclick = () => selectSuggestion(suggestion);
     suggestionsDiv.appendChild(div);
   });
