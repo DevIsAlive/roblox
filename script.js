@@ -57,7 +57,6 @@ input.addEventListener('input', () => {
   if (partialUsername.length < 2) {
     suggestionsDiv.innerHTML = '';
     suggestionsDiv.classList.remove('show');
-    positionNotificationsContainer();
     return;
   }
 
@@ -65,7 +64,6 @@ input.addEventListener('input', () => {
   if (!hasMovedDown) {
     form.classList.add('suggestions-active');
     hasMovedDown = true;
-    positionNotificationsContainer();
   }
 
   typingStoppedTimer = setTimeout(() => {
@@ -77,7 +75,6 @@ input.addEventListener('blur', () => {
   // Don't remove suggestions-active class on blur
   setTimeout(() => {
     suggestionsDiv.classList.remove('show');
-    positionNotificationsContainer();
   }, 200);
 });
 
@@ -87,6 +84,13 @@ form.addEventListener('submit', (e) => {
   if (username) {
     suggestionsDiv.classList.remove('show');
     showAvatar(username);
+  }
+});
+
+form.addEventListener('transitionend', (event) => {
+  // Only trigger if the transform property finished transitioning
+  if (event.propertyName === 'transform') {
+    positionNotificationsContainer();
   }
 });
 
@@ -295,8 +299,6 @@ function addNotification() {
       oldestNotification.remove();
       // After removal, reposition existing notifications smoothly
       updateNotificationPositions();
-      // Reposition container after a notification is removed
-      positionNotificationsContainer();
     }, { once: true });
   }
 
