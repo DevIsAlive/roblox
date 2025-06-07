@@ -20,7 +20,7 @@ exports.handler = async (event) => {
   const sanitizedKeyword = keyword.trim();
   if (sanitizedKeyword.length < 3 || sanitizedKeyword.length > 20 || !/^[a-zA-Z0-9]+$/.test(sanitizedKeyword)) {
     console.log(`Invalid keyword: "${keyword}" - must be 3-20 alphanumeric characters`);
-    return await getFallbackSuggestions();
+    return await fetchPopularUsers();
   }
 
   try {
@@ -60,37 +60,37 @@ exports.handler = async (event) => {
       throw new Error('Max retries reached for 429 error');
     };
 
-    // Step 1: Search for similar usernames
+    // Step 1: Generate username variations and search using /v1/usernames/users
+    const usernameVariations = [
+      sanitizedKeyword,
+      `${sanitizedKeyword}er`,
+      `${sanitizedKeyword}s`,
+      `${sanitizedKeyword}123`,
+      `${sanitizedKeyword}X`
+    ];
+
     const searchOptions = {
-      method: 'GET',
+      method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         'Accept': 'application/json',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      }
+      },
+      body: JSON.stringify({
+        usernames: usernameVariations,
+        excludeBannedUsers: true
+      })
     };
 
-    const searchData = await fetchWithRetry(`https://users.roblox.com/v1/users/search?keyword=${encodeURIComponent(sanitizedKeyword)}&limit=${minSuggestions}`, searchOptions);
+    const searchData = await fetchWithRetry('https://users.roblox.com/v1/usernames/users', searchOptions);
     users = searchData.data.map(user => ({
       username: user.name,
       userId: user.id
     }));
 
-    // Step 2: If fewer than 5 results, add popular users as fallback
+    // Step 2: If fewer than 5 results, fetch popular users as fallback
     if (users.length < minSuggestions) {
-      const popularOptions = {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
-      };
-
-      const popularData = await fetchWithRetry('https://users.roblox.com/v1/users/search?keyword=roblox&limit=10', popularOptions);
-      const popularUsers = popularData.data.map(user => ({
-        username: user.name,
-        userId: user.id
-      }));
-
+      const popularUsers = await fetchPopularUsers();
       popularUsers.forEach(user => {
         if (!users.some(u => u.userId === user.userId) && users.length < minSuggestions) {
           users.push(user);
@@ -110,38 +110,42 @@ exports.handler = async (event) => {
     };
   } catch (error) {
     console.error('Search error:', error.message);
-    return await getFallbackSuggestions();
+    return await fetchPopularUsers();
   }
 };
 
-// Fallback function to return popular users
-async function getFallbackSuggestions() {
+// Fetch popular users as a fallback
+async function fetchPopularUsers() {
   try {
     const popularOptions = {
-      method: 'GET',
+      method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         'Accept': 'application/json',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      }
+      },
+      body: JSON.stringify({
+        usernames: ['Roblox', 'Builderman', 'Admin', 'Brighteyes', 'Sharkblox'],
+        excludeBannedUsers: true
+      })
     };
 
-    const popularData = await fetch('https://users.roblox.com/v1/users/search?keyword=roblox&limit=5', popularOptions);
+    const popularData = await fetch('https://users.roblox.com/v1/usernames/users', popularOptions);
     if (!popularData.ok) {
+      console.log(`Fallback API error: status ${popularData.status}, body ${await popularData.text()}`);
       throw new Error(`Fallback HTTP error! status: ${popularData.status}`);
     }
-    const users = popularData.data.map(user => ({
+    const popularResponse = await popularData.json();
+    const users = popularResponse.data.map(user => ({
       username: user.name,
       userId: user.id
     }));
-    return {
-      statusCode: 200,
-      body: JSON.stringify(users)
-    };
+    return users;
   } catch (error) {
     console.error('Fallback error:', error.message);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Error loading suggestions: Unable to fetch fallback data' })
+      body: JSON.stringify({ error: 'Error loading suggestions: Unable to fetch data' })
     };
   }
 }
