@@ -1,6 +1,6 @@
 body {
   font-family: 'Inter', Arial, sans-serif;
-  background: linear-gradient(135deg, #e3f0ff 0%, #ffffff 100%);
+  background: linear-gradient(135deg, #e8f4ff 0%, #f0f8ff 50%, #e3f0ff 100%);
   min-height: 100vh;
   margin: 0;
   display: flex;
@@ -148,17 +148,18 @@ button:hover {
 }
 
 .suggestion::after {
-  content: 'tap';
+  content: 'click';
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: #2196f3;
+  color: #000;
   font-size: 1.5rem;
   font-weight: 600;
-  text-shadow: 0 0 10px rgba(33, 150, 243, 0.3);
-  opacity: 0.8;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  opacity: 0.9;
   pointer-events: none;
+  margin-top: -2px;
 }
 
 .suggestion:hover {
