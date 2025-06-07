@@ -580,6 +580,34 @@ button:hover {
   animation: flashRed 0.5s ease-out; /* Run animation for 0.5s */
 }
 
+/* Pulsing effects for Profile Value */
+@keyframes subtlePulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.01); opacity: 0.98; }
+}
+
+@keyframes mediumPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.02); opacity: 0.95; }
+}
+
+@keyframes strongPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.03); opacity: 0.9; }
+}
+
+.profile-value.pulse-low {
+  animation: subtlePulse 2s infinite ease-in-out;
+}
+
+.profile-value.pulse-medium {
+  animation: mediumPulse 1.5s infinite ease-in-out;
+}
+
+.profile-value.pulse-high {
+  animation: strongPulse 1s infinite ease-in-out;
+}
+
 /* Slot Machine Styles */
 .carousel-container {
   position: relative;
