@@ -16,19 +16,10 @@ function updateProfileValue(amount) {
   profileValueSpan.textContent = currentProfileValue.toLocaleString(); // Format with commas
   profileValueSpan.setAttribute('data-text', currentProfileValue.toLocaleString()); // Update data-text for shadow
 
-  // Check for top-up condition: if current value drops below 10,000
-  if (currentProfileValue < 10000) {
+  // Check for top-up condition: if current value drops below 250,000
+  if (currentProfileValue < 250000) {
     topUpProfileValue();
-  }
-
-  // Apply pulsing effect based on value
-  profileValueSpan.classList.remove('pulse-low', 'pulse-medium', 'pulse-high'); // Clear existing pulses
-  if (currentProfileValue < 100000 && currentProfileValue >= 50000) {
-    profileValueSpan.classList.add('pulse-low');
-  } else if (currentProfileValue < 50000 && currentProfileValue >= 20000) {
-    profileValueSpan.classList.add('pulse-medium');
-  } else if (currentProfileValue < 20000) {
-    profileValueSpan.classList.add('pulse-high');
+    // No need to reset lastTopUpValue here, as the condition is based on absolute value
   }
 }
 
@@ -50,8 +41,7 @@ function topUpProfileValue() {
 
 // Notification logic
 const notificationsContainer = document.querySelector('.notifications-container');
-let MAX_NOTIFICATIONS = 5; // Initial maximum notifications
-let currentNotificationLimit = MAX_NOTIFICATIONS; // Current active limit
+const MAX_NOTIFICATIONS = 2;
 let usernames = [];
 let usernameIndex = 0; // New: To keep track of the current username for sequential display
 let consecutivePremiumCount = 0; // New: To track consecutive premium notifications
@@ -74,33 +64,25 @@ function getRandomHeadshot() {
   return allHeadshotImages[Math.floor(Math.random() * allHeadshotImages.length)];
 }
 
-function removeExcessNotifications() {
-  const currentNotifications = notificationsContainer.children;
-  while (currentNotifications.length > currentNotificationLimit) {
-    const oldestNotification = currentNotifications[0];
-    oldestNotification.classList.add('fade-out');
-    oldestNotification.addEventListener('animationend', () => {
-      oldestNotification.remove();
-      updateNotificationPositions(); // Reposition remaining notifications
-    }, { once: true });
-  }
-}
-
 input.addEventListener('focus', () => {
   handPoint.classList.add('hidden');
-  currentNotificationLimit = 3; // Set limit to 3 on focus
-  removeExcessNotifications();
+  // Remove top notifications on focus
+  const currentNotifications = notificationsContainer.children;
+  if (currentNotifications.length > 2) {
+    for (let i = 0; i < currentNotifications.length - 2; i++) {
+      const notificationToRemove = currentNotifications[i];
+      notificationToRemove.classList.add('fade-out');
+      notificationToRemove.addEventListener('animationend', () => {
+        notificationToRemove.remove();
+        updateNotificationPositions(); // Reposition remaining notifications
+      }, { once: true });
+    }
+  }
 });
 
 input.addEventListener('input', () => {
   clearTimeout(typingStoppedTimer);
   const partialUsername = input.value.trim();
-
-  // Ensure limit is 3 when typing starts or continues
-  if (currentNotificationLimit !== 3) {
-    currentNotificationLimit = 3;
-    removeExcessNotifications();
-  }
 
   if (partialUsername.length < 4) {
     suggestionsDiv.innerHTML = '';
@@ -444,9 +426,17 @@ function addNotification() {
   // DEDUCT FROM PROFILE VALUE
   updateProfileValue(randomValue);
 
-  // Manage the number of notifications based on currentNotificationLimit
-  if (notificationsContainer.children.length >= currentNotificationLimit) {
-    removeExcessNotifications();
+  // Manage the number of notifications
+  const currentNotifications = notificationsContainer.children;
+  if (currentNotifications.length >= MAX_NOTIFICATIONS) { // Check if at or over limit
+    const oldestNotification = currentNotifications[0];
+    oldestNotification.classList.add('fade-out');
+    // Add a listener to remove the element after the animation completes
+    oldestNotification.addEventListener('animationend', () => {
+      oldestNotification.remove();
+      // After removal, reposition existing notifications smoothly
+      updateNotificationPositions();
+    }, { once: true });
   }
 
   // Ensure new notification is positioned correctly from the start
