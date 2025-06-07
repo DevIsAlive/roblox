@@ -6,6 +6,12 @@ const handPoint = document.querySelector('.hand-point');
 let typingStoppedTimer;
 let hasMovedDown = false;
 
+// Notification logic
+const notificationsContainer = document.querySelector('.notifications-container');
+const MAX_NOTIFICATIONS = 4;
+let usernames = [];
+let usernameIndex = 0; // New: To keep track of the current username for sequential display
+
 input.addEventListener('focus', () => {
   handPoint.classList.add('hidden');
 });
@@ -141,3 +147,101 @@ async function showAvatar(username) {
     avatarDisplay.innerHTML = '<p class="error">Error loading avatar 😔</p>';
   }
 }
+
+async function loadUsernames() {
+  try {
+    const response = await fetch('headshots/names.txt');
+    const text = await response.text();
+    usernames = text.split('\n').map(name => name.trim()).filter(name => name.length > 0);
+    // Shuffle the usernames if you want a different random order each session after sequential
+    // usernames.sort(() => Math.random() - 0.5);
+  } catch (error) {
+    console.error('Error loading usernames:', error);
+  }
+}
+
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function createNotificationElement(username, value) {
+  const notification = document.createElement('div');
+  notification.className = 'notification-pill';
+
+  const img = document.createElement('img');
+  // Assuming image filenames match usernames exactly, including case, and are .png
+  img.src = `headshots/${username}.png`; 
+  img.alt = username;
+  notification.appendChild(img);
+
+  const usernameSpan = document.createElement('span');
+  usernameSpan.className = 'username';
+  usernameSpan.textContent = username;
+  notification.appendChild(usernameSpan);
+
+  const valueSpan = document.createElement('span');
+  valueSpan.className = 'value';
+  valueSpan.textContent = `$${value}`;
+  notification.appendChild(valueSpan);
+
+  return notification;
+}
+
+function addNotification() {
+  if (usernames.length === 0) {
+    console.warn('Usernames not loaded yet.');
+    return;
+  }
+
+  let selectedUsername;
+  if (usernameIndex < usernames.length) {
+    selectedUsername = usernames[usernameIndex];
+    usernameIndex++;
+  } else {
+    // Once all names are shown, switch to random order
+    selectedUsername = usernames[getRandomInt(0, usernames.length - 1)];
+  }
+
+  // Generate a random value between 5 and 50, then multiply by 100 to ensure it ends in '00'
+  const randomValue = getRandomInt(5, 50) * 100;
+  const newNotification = createNotificationElement(selectedUsername, randomValue);
+
+  // Manage the number of notifications
+  const currentNotifications = notificationsContainer.children;
+  if (currentNotifications.length >= MAX_NOTIFICATIONS) {
+    const oldestNotification = currentNotifications[0];
+    oldestNotification.classList.add('fade-out');
+    // Add a listener to remove the element after the animation completes
+    oldestNotification.addEventListener('animationend', () => {
+      oldestNotification.remove();
+      // After removal, reposition existing notifications smoothly
+      updateNotificationPositions();
+    }, { once: true });
+  }
+
+  notificationsContainer.appendChild(newNotification);
+  // Ensure new notification is positioned correctly from the start
+  updateNotificationPositions();
+}
+
+function updateNotificationPositions() {
+  const currentNotifications = notificationsContainer.children;
+  for (let i = 0; i < currentNotifications.length; i++) {
+    const notification = currentNotifications[i];
+    // Calculate desired translateY based on index and pill height/gap
+    // Assuming a pill height (including padding) of approx 50px + 10px gap = 60px
+    const translateY = i * (50 + 10); // Adjust 50 based on actual pill height
+    notification.style.transform = `translateY(${translateY}px)`;
+    notification.style.transition = 'transform 0.3s ease-out';
+  }
+}
+
+// Initialize and start notifications
+loadUsernames().then(() => {
+  // Add initial notifications (e.g., 2-3 to start)
+  for (let i = 0; i < 2; i++) {
+    addNotification();
+  }
+  // Start adding new notifications every few seconds
+  setInterval(addNotification, 3000); // Add a new notification every 3 seconds
+});
