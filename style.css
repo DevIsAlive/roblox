@@ -368,9 +368,11 @@ button:hover {
 }
 
 .notifications-container {
-  position: fixed;
-  top: 20px;
-  left: 20px;
+  position: absolute;
+  top: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -395,7 +397,7 @@ button:hover {
 }
 
 .notification-pill.fade-out {
-  animation: fadeOutNotification 0.4s ease-out forwards;
+  animation: fadeOutNotification 0.2s ease-out forwards;
 }
 
 .notification-pill img {
@@ -423,6 +425,17 @@ button:hover {
   margin-left: 10px;
   font-size: 0.9em;
   flex-shrink: 0;
+  display: flex;
+  align-items: center; /* Align items vertically */
+}
+
+.notification-pill .roblox-currency-icon {
+  width: 16px; /* Adjust size as needed */
+  height: 16px; /* Adjust size as needed */
+  margin-right: 4px; /* Space between icon and value */
+  vertical-align: middle; /* Align with text */
+  border: none; /* Removed blue border */
+  opacity: 0.7; /* Grayed out slightly */
 }
 
 @keyframes fadeInNotification {
@@ -446,4 +459,106 @@ button:hover {
     transform: translateY(-10px); /* Smaller upward movement */
     margin-top: -40px; /* Collapse space more subtly */
   }
+}
+
+/* Premium Notification Effect */
+.notification-pill.premium {
+  box-shadow: 
+    0 0 0 2px rgba(0, 102, 255, 0.4), /* Subtle blue border glow */
+    0 8px 30px rgba(0, 102, 255, 0.3), /* Enhanced blue shadow */
+    0 4px 10px rgba(0,0,0,0.1); /* General shadow */
+  transform: translateY(-5px); /* Slightly lift it up */
+  transition: all 0.3s ease-in-out; /* Smooth transition for premium effects */
+  overflow: hidden; /* Ensure sheen stays within bounds */
+  position: relative; /* For positioning the sheen pseudo-element */
+}
+
+.notification-pill.premium:hover {
+  transform: translateY(-10px) scale(1.02); /* More pronounced lift on hover */
+  box-shadow: 
+    0 0 0 3px rgba(0, 102, 255, 0.6), /* Stronger blue border glow */
+    0 12px 40px rgba(0, 102, 255, 0.4), /* Even more enhanced blue shadow */
+    0 6px 15px rgba(0,0,0,0.15); /* Stronger general shadow */
+}
+
+/* New minimalistic premium text effect */
+.notification-pill.premium .username, 
+.notification-pill.premium .value {
+  background: linear-gradient(90deg, #66b3ff, #80cfff, #66b3ff); /* Darker blue gradient */
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  animation: premiumTextGlow 3s linear infinite; /* Subtle animation */
+}
+
+@keyframes premiumTextGlow {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.profile-info-container {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 30px;
+  padding: 10px 20px;
+  box-shadow: 0 4px 15px rgba(0, 102, 255, 0.1), 0 2px 5px rgba(0,0,0,0.05);
+  z-index: 2000;
+}
+
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid #0066ff; /* Blue circle border */
+  margin-right: 10px;
+  object-fit: cover;
+}
+
+.profile-value {
+  font-weight: 700;
+  color: #1a237e; /* Dark blue text color */
+  font-size: 1.2em;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Apply premium text glow to profile value when topped up */
+.profile-value.glowing {
+  background: linear-gradient(90deg, #66b3ff, #80cfff, #66b3ff); /* Same gradient as premium notifications */
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  animation: premiumTextGlow 3s linear infinite; /* Reuse the existing glow animation */
+}
+
+/* The @keyframes premiumTextGlow is already defined later in the file */
+
+/* Flash Red Animation for Profile Value */
+@keyframes flashRed {
+  0% {
+    color: #1a237e; /* Original dark blue color */
+  }
+  50% {
+    color: #d32f2f; /* Red color */
+  }
+  100% {
+    color: #1a237e; /* Back to original */
+  }
+}
+
+.profile-value.flash-red {
+  animation: flashRed 0.5s ease-out; /* Run animation for 0.5s */
 }
