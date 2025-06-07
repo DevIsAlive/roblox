@@ -36,7 +36,7 @@ exports.handler = async (event) => {
     }
 
     let users = [];
-    const minSuggestions = 5;
+    const minSuggestions = 3;
     const maxRetries = 3;
     let retryCount = 0;
 
@@ -61,12 +61,10 @@ exports.handler = async (event) => {
     };
 
     // Step 1: Generate username variations and search using /v1/usernames/users
-    const usernameVariations = [
+    let usernameVariations = [
       sanitizedKeyword,
-      `${sanitizedKeyword}er`,
-      `${sanitizedKeyword}s`,
-      `${sanitizedKeyword}123`,
-      `${sanitizedKeyword}X`
+      `${sanitizedKeyword}1`,
+      `${sanitizedKeyword}2`
     ];
 
     const searchOptions = {
@@ -88,17 +86,7 @@ exports.handler = async (event) => {
       userId: user.id
     }));
 
-    // Step 2: If fewer than 5 results, fetch popular users as fallback
-    if (users.length < minSuggestions) {
-      const popularUsers = await fetchPopularUsers();
-      popularUsers.forEach(user => {
-        if (!users.some(u => u.userId === user.userId) && users.length < minSuggestions) {
-          users.push(user);
-        }
-      });
-    }
-
-    // Ensure exactly 5 suggestions
+    // No fallback to popular users. Only return up to 3 suggestions.
     users = users.slice(0, minSuggestions);
 
     // Cache the result
