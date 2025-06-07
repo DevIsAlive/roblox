@@ -75,7 +75,8 @@ button:hover {
 .suggestions {
   position: absolute;
   left: 50%;
-  bottom: 100%;
+  top: auto;
+  bottom: calc(100% + 12px);
   display: flex;
   flex-direction: row;
   gap: 16px;
@@ -200,5 +201,9 @@ button:hover {
     max-width: 100%;
     padding-left: 16px;
     padding-right: 16px;
+  }
+  .suggestions {
+    max-width: 96vw;
+    gap: 8px;
   }
 }
