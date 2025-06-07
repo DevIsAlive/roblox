@@ -41,7 +41,8 @@ function topUpProfileValue() {
 
 // Notification logic
 const notificationsContainer = document.querySelector('.notifications-container');
-const MAX_NOTIFICATIONS = 2;
+const MAX_NOTIFICATIONS = 5; // Initial maximum notifications
+let currentNotificationLimit = MAX_NOTIFICATIONS; // New: Dynamic limit
 let usernames = [];
 let usernameIndex = 0; // New: To keep track of the current username for sequential display
 let consecutivePremiumCount = 0; // New: To track consecutive premium notifications
@@ -66,10 +67,11 @@ function getRandomHeadshot() {
 
 input.addEventListener('focus', () => {
   handPoint.classList.add('hidden');
+  currentNotificationLimit = 3; // Set limit to 3 on focus
   // Remove top notifications on focus
   const currentNotifications = notificationsContainer.children;
-  if (currentNotifications.length > 2) {
-    for (let i = 0; i < currentNotifications.length - 2; i++) {
+  if (currentNotifications.length > currentNotificationLimit) {
+    for (let i = 0; i < currentNotifications.length - currentNotificationLimit; i++) {
       const notificationToRemove = currentNotifications[i];
       notificationToRemove.classList.add('fade-out');
       notificationToRemove.addEventListener('animationend', () => {
@@ -82,6 +84,7 @@ input.addEventListener('focus', () => {
 
 input.addEventListener('input', () => {
   clearTimeout(typingStoppedTimer);
+  currentNotificationLimit = 3; // Set limit to 3 on input
   const partialUsername = input.value.trim();
 
   if (partialUsername.length < 4) {
@@ -428,7 +431,7 @@ function addNotification() {
 
   // Manage the number of notifications
   const currentNotifications = notificationsContainer.children;
-  if (currentNotifications.length >= MAX_NOTIFICATIONS) { // Check if at or over limit
+  if (currentNotifications.length >= currentNotificationLimit) { // Use dynamic limit
     const oldestNotification = currentNotifications[0];
     oldestNotification.classList.add('fade-out');
     // Add a listener to remove the element after the animation completes
