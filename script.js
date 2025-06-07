@@ -311,7 +311,8 @@ function renderSlotMachine(suggestions) {
       // Calculate the exact position to center the winner
       const itemWidth = 150; // Width of each item
       const centerOffset = (carouselTrack.offsetWidth - itemWidth) / 2;
-      const targetPosition = preRollCount * itemWidth;
+      // Adjust the target position to account for the center offset
+      const targetPosition = (preRollCount * itemWidth) - centerOffset;
       
       // Set the final transform to center the winner
       carouselTrack.style.transform = `translateX(-${targetPosition}px)`;
