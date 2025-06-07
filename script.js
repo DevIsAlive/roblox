@@ -298,28 +298,29 @@ function renderSlotMachine(suggestions) {
     carouselTrack.appendChild(item);
   }
 
-  // Calculate the target position before starting the animation
-  const itemWidth = 150; // Width of each item
-  const targetPosition = (preRollCount - 2) * itemWidth;
-
   // Wait a short moment before starting the landing animation
   setTimeout(() => {
     // Remove continuous spinning
     carouselTrack.classList.remove('spinning-continuous');
     
-    // Set the initial position for the landing animation
-    carouselTrack.style.transform = `translateX(-${targetPosition}px)`;
+    // Calculate the target position
+    const itemWidth = 150; // Width of each item
+    const targetPosition = (preRollCount - 2) * itemWidth;
     
-    // Force a reflow to ensure the transform is applied
+    // Reset any existing transform
+    carouselTrack.style.transform = 'translateX(0)';
+    
+    // Force a reflow
     void carouselTrack.offsetWidth;
     
     // Add landing animation
     carouselTrack.classList.add('spinning-land');
+    
+    // Set the final position immediately
+    carouselTrack.style.transform = `translateX(-${targetPosition}px)`;
 
     // Add an event listener to lock the final position
     const onAnimationEnd = () => {
-      // Ensure the final position is exactly where we want it
-      carouselTrack.style.transform = `translateX(-${targetPosition}px)`;
       carouselTrack.classList.remove('spinning-land');
       carouselTrack.removeEventListener('animationend', onAnimationEnd);
       carouselTrack.classList.add('winner-glow');
