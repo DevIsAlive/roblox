@@ -382,8 +382,8 @@ button:hover {
 }
 
 .notifications-container {
-  position: absolute;
-  top: auto;
+  position: fixed;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   margin-top: 0;
@@ -391,6 +391,9 @@ button:hover {
   flex-direction: column;
   gap: 10px;
   z-index: 2000;
+  width: 90%;
+  max-width: 400px;
+  align-items: center;
 }
 
 .notification-pill {

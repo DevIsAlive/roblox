@@ -211,16 +211,18 @@ function renderSlotMachine(suggestions) {
   carouselTrack.classList.remove('spinning-continuous');
   carouselTrack.classList.remove('spinning-land');
 
-  // 3. Apply the current transform directly as an inline style to lock its position
-  carouselTrack.style.transform = currentTransform;
-  void carouselTrack.offsetWidth; // Force reflow to apply the inline style immediately
+  // 3. Set the CSS variable for the landing animation's starting point
+  carouselTrack.style.setProperty('--start-transform', currentTransform);
 
-  // 4. Clear existing items by removing children
+  // 4. Force reflow to ensure the CSS variable is applied and recognized by the browser
+  void carouselTrack.offsetWidth;
+
+  // 5. Clear and rebuild content
   while (carouselTrack.firstChild) {
     carouselTrack.removeChild(carouselTrack.firstChild);
   }
 
-  // 5. Add pre-roll items (blurry headshots)
+  // Add pre-roll items (blurry headshots)
   for (let i = 0; i < 20; i++) {
     const item = document.createElement('div');
     item.className = 'item gray';
@@ -232,7 +234,7 @@ function renderSlotMachine(suggestions) {
     carouselTrack.appendChild(item);
   }
 
-  // 6. Add the target suggestion
+  // Add the target suggestion
   const targetSuggestion = suggestions[0];
   const targetItem = document.createElement('div');
   targetItem.className = 'item winner';
@@ -246,7 +248,7 @@ function renderSlotMachine(suggestions) {
   targetItem.appendChild(img);
   carouselTrack.appendChild(targetItem);
 
-  // 7. Add post-roll items (blurry headshots)
+  // Add post-roll items (blurry headshots)
   for (let i = 0; i < 20; i++) {
     const item = document.createElement('div');
     item.className = 'item gray';
@@ -258,15 +260,15 @@ function renderSlotMachine(suggestions) {
     carouselTrack.appendChild(item);
   }
 
-  // 8. Add landing animation class
+  // 6. Add landing animation class
   carouselTrack.classList.add('spinning-land');
-  
-  // 9. Add an event listener to lock the final position after the landing animation ends
+
+  // 7. Add an event listener to lock the final position
   const onAnimationEnd = () => {
-    carouselTrack.style.transform = window.getComputedStyle(carouselTrack).transform; // Reinstated
+    carouselTrack.style.transform = window.getComputedStyle(carouselTrack).transform;
     carouselTrack.classList.remove('spinning-land');
     carouselTrack.removeEventListener('animationend', onAnimationEnd);
-    carouselTrack.classList.add('winner-glow'); // Apply glow after animation settles
+    carouselTrack.classList.add('winner-glow');
     targetItem.addEventListener('click', () => selectSuggestion(targetSuggestion));
   };
 
@@ -427,8 +429,6 @@ function addNotification() {
 
   // Ensure new notification is positioned correctly from the start
   updateNotificationPositions();
-  // Reposition container after a new notification is added
-  positionNotificationsContainer();
 }
 
 function updateNotificationPositions() {
@@ -444,11 +444,9 @@ function updateNotificationPositions() {
   }
 }
 
-function positionNotificationsContainer() {
-  const formRect = form.getBoundingClientRect();
-  const margin = 30; // Desired margin below the input box
-  notificationsContainer.style.top = `${formRect.bottom + margin}px`;
-}
+// When a suggestion is selected, move the form back up slightly if it was moved down
+form.classList.remove('suggestions-active');
+hasMovedDown = false;
 
 // Initialize and start notifications
 loadUsernames().then(() => {
@@ -456,8 +454,6 @@ loadUsernames().then(() => {
   for (let i = 0; i < 2; i++) {
     addNotification();
   }
-  // Set initial position after first notifications are added
-  positionNotificationsContainer();
   // Start adding new notifications every few seconds
-  setInterval(addNotification, 1500); // Add a new notification every 1.5 seconds (was 3 seconds)
+  setInterval(addNotification, 1500);
 });
