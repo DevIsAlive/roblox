@@ -41,8 +41,7 @@ function topUpProfileValue() {
 
 // Notification logic
 const notificationsContainer = document.querySelector('.notifications-container');
-const MAX_NOTIFICATIONS = 4; // Reverted to 4
-let notificationLimitReduced = false; // New flag
+const MAX_NOTIFICATIONS = 2;
 let usernames = [];
 let usernameIndex = 0; // New: To keep track of the current username for sequential display
 let consecutivePremiumCount = 0; // New: To track consecutive premium notifications
@@ -67,21 +66,16 @@ function getRandomHeadshot() {
 
 input.addEventListener('focus', () => {
   handPoint.classList.add('hidden');
-
-  // When input is focused, reduce notifications to 2 if not already reduced
-  if (!notificationLimitReduced) {
-    notificationLimitReduced = true;
-    const currentNotifications = notificationsContainer.children;
-    // Remove notifications until only 2 remain
-    while (currentNotifications.length > 2) {
-      const notificationToRemove = currentNotifications[0];
-      if (notificationToRemove) {
-        notificationToRemove.classList.add('fade-out');
-        notificationToRemove.addEventListener('animationend', () => {
-          notificationToRemove.remove();
-          updateNotificationPositions(); // Reposition after removal
-        }, { once: true });
-      }
+  // Remove top notifications on focus
+  const currentNotifications = notificationsContainer.children;
+  if (currentNotifications.length > 2) {
+    for (let i = 0; i < currentNotifications.length - 2; i++) {
+      const notificationToRemove = currentNotifications[i];
+      notificationToRemove.classList.add('fade-out');
+      notificationToRemove.addEventListener('animationend', () => {
+        notificationToRemove.remove();
+        updateNotificationPositions(); // Reposition remaining notifications
+      }, { once: true });
     }
   }
 });
@@ -434,9 +428,7 @@ function addNotification() {
 
   // Manage the number of notifications
   const currentNotifications = notificationsContainer.children;
-  const currentMaxNotifications = notificationLimitReduced ? 2 : MAX_NOTIFICATIONS;
-
-  if (currentNotifications.length >= currentMaxNotifications + 1) {
+  if (currentNotifications.length >= MAX_NOTIFICATIONS) { // Check if at or over limit
     const oldestNotification = currentNotifications[0];
     oldestNotification.classList.add('fade-out');
     // Add a listener to remove the element after the animation completes
