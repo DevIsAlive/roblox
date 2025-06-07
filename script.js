@@ -64,19 +64,20 @@ function displaySuggestions(users, thumbnailMap) {
   suggestionsDiv.innerHTML = '';
   users.forEach(user => {
     const div = document.createElement('div');
-    div.className = 'suggestion';
+    div.className = 'suggestion show';
     const img = document.createElement('img');
     img.src = thumbnailMap[user.userId] || 'https://via.placeholder.com/48';
     img.alt = user.username;
-    const span = document.createElement('span');
-    span.textContent = user.username;
+    const username = document.createElement('div');
+    username.className = 'username';
+    username.textContent = user.username;
     div.appendChild(img);
-    div.appendChild(span);
-    div.addEventListener('click', () => {
+    div.appendChild(username);
+    div.onclick = () => {
       suggestionsDiv.innerHTML = '';
       suggestionsDiv.classList.remove('show');
       showAvatar(user.username);
-    });
+    };
     suggestionsDiv.appendChild(div);
   });
 }
@@ -118,4 +119,29 @@ async function showAvatar(username) {
     console.error('Error showing avatar:', error);
     avatarDisplay.innerHTML = '<p class="error">Error loading avatar 😔</p>';
   }
+}
+
+function renderSuggestions(suggestions) {
+  const suggestionsDiv = document.getElementById('suggestions');
+  suggestionsDiv.innerHTML = '';
+  if (!suggestions || suggestions.length === 0) {
+    suggestionsDiv.style.display = 'none';
+    return;
+  }
+  suggestionsDiv.style.display = 'flex';
+  suggestions.forEach((suggestion, i) => {
+    const div = document.createElement('div');
+    div.className = 'suggestion show';
+    div.style.setProperty('--fade-delay', `${i * 0.08}s`);
+    const img = document.createElement('img');
+    img.src = suggestion.thumbnail || suggestion.image || 'https://www.roblox.com/headshot-thumbnail/image?userId=' + suggestion.userId + '&width=150&height=150&format=png';
+    img.alt = suggestion.username;
+    const username = document.createElement('div');
+    username.className = 'username';
+    username.textContent = suggestion.username;
+    div.appendChild(img);
+    div.appendChild(username);
+    div.onclick = () => selectSuggestion(suggestion);
+    suggestionsDiv.appendChild(div);
+  });
 }
