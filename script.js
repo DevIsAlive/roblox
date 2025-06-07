@@ -336,5 +336,5 @@ loadUsernames().then(() => {
   // Set initial position after first notifications are added
   positionNotificationsContainer();
   // Start adding new notifications every few seconds
-  setInterval(addNotification, 3000); // Add a new notification every 3 seconds
+  setInterval(addNotification, 1500); // Add a new notification every 1.5 seconds (was 3 seconds)
 });
