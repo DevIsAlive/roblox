@@ -298,23 +298,27 @@ function renderSlotMachine(suggestions) {
     carouselTrack.appendChild(item);
   }
 
+  // Calculate the target position before starting the animation
+  const itemWidth = 150; // Width of each item
+  const targetPosition = (preRollCount - 2) * itemWidth;
+
   // Wait a short moment before starting the landing animation
   setTimeout(() => {
     // Remove continuous spinning
     carouselTrack.classList.remove('spinning-continuous');
+    
+    // Set the initial position for the landing animation
+    carouselTrack.style.transform = `translateX(-${targetPosition}px)`;
+    
+    // Force a reflow to ensure the transform is applied
+    void carouselTrack.offsetWidth;
     
     // Add landing animation
     carouselTrack.classList.add('spinning-land');
 
     // Add an event listener to lock the final position
     const onAnimationEnd = () => {
-      // Calculate the exact position to center the winner
-      const itemWidth = 150; // Width of each item
-      const centerOffset = (carouselTrack.offsetWidth - itemWidth) / 2;
-      // Adjust the target position to account for the exact number of items to scroll
-      const targetPosition = (preRollCount - 2) * itemWidth; // Subtract 2 to land exactly on the target
-      
-      // Set the final transform to center the winner
+      // Ensure the final position is exactly where we want it
       carouselTrack.style.transform = `translateX(-${targetPosition}px)`;
       carouselTrack.classList.remove('spinning-land');
       carouselTrack.removeEventListener('animationend', onAnimationEnd);
