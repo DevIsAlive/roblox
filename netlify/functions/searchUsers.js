@@ -16,9 +16,16 @@ exports.handler = async (event) => {
     };
   }
 
+  // Validate keyword: 3-20 characters, alphanumeric only
+  const sanitizedKeyword = keyword.trim();
+  if (sanitizedKeyword.length < 3 || sanitizedKeyword.length > 20 || !/^[a-zA-Z0-9]+$/.test(sanitizedKeyword)) {
+    console.log(`Invalid keyword: "${keyword}" - must be 3-20 alphanumeric characters`);
+    return await getFallbackSuggestions();
+  }
+
   try {
     const now = Date.now();
-    const cachedResult = cache[keyword];
+    const cachedResult = cache[sanitizedKeyword];
 
     // Check if we have a valid cached result
     if (cachedResult && (now - cachedResult.timestamp) < CACHE_DURATION) {
@@ -45,6 +52,7 @@ exports.handler = async (event) => {
           continue;
         }
         if (!response.ok) {
+          console.log(`API error for ${url}: status ${response.status}, body ${await response.text()}`);
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
@@ -61,7 +69,7 @@ exports.handler = async (event) => {
       }
     };
 
-    const searchData = await fetchWithRetry(`https://users.roblox.com/v1/users/search?keyword=${encodeURIComponent(keyword)}&limit=${minSuggestions}`, searchOptions);
+    const searchData = await fetchWithRetry(`https://users.roblox.com/v1/users/search?keyword=${encodeURIComponent(sanitizedKeyword)}&limit=${minSuggestions}`, searchOptions);
     users = searchData.data.map(user => ({
       username: user.name,
       userId: user.id
@@ -94,7 +102,7 @@ exports.handler = async (event) => {
     users = users.slice(0, minSuggestions);
 
     // Cache the result
-    cache[keyword] = { users, timestamp: now };
+    cache[sanitizedKeyword] = { users, timestamp: now };
 
     return {
       statusCode: 200,
@@ -102,9 +110,38 @@ exports.handler = async (event) => {
     };
   } catch (error) {
     console.error('Search error:', error.message);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Error searching users: ' + error.message })
-    };
+    return await getFallbackSuggestions();
   }
 };
+
+// Fallback function to return popular users
+async function getFallbackSuggestions() {
+  try {
+    const popularOptions = {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    };
+
+    const popularData = await fetch('https://users.roblox.com/v1/users/search?keyword=roblox&limit=5', popularOptions);
+    if (!popularData.ok) {
+      throw new Error(`Fallback HTTP error! status: ${popularData.status}`);
+    }
+    const users = popularData.data.map(user => ({
+      username: user.name,
+      userId: user.id
+    }));
+    return {
+      statusCode: 200,
+      body: JSON.stringify(users)
+    };
+  } catch (error) {
+    console.error('Fallback error:', error.message);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Error loading suggestions: Unable to fetch fallback data' })
+    };
+  }
+}
