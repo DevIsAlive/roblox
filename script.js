@@ -225,11 +225,11 @@ async function fetchSuggestions(keyword) {
       }));
       renderSlotMachine(suggestions);
     } else {
-      // Instead of showing "no suggestions found", keep spinning
+      // Keep spinning if no suggestions found
       const carouselTrack = suggestionsDiv.querySelector('.carousel-track');
       if (carouselTrack) {
         carouselTrack.classList.add('spinning-continuous');
-        carouselTrack.classList.remove('spinning-land'); // Ensure landing animation is removed
+        carouselTrack.classList.remove('spinning-land');
       }
     }
   } catch (error) {
@@ -238,7 +238,7 @@ async function fetchSuggestions(keyword) {
     const carouselTrack = suggestionsDiv.querySelector('.carousel-track');
     if (carouselTrack) {
       carouselTrack.classList.add('spinning-continuous');
-      carouselTrack.classList.remove('spinning-land'); // Ensure landing animation is removed
+      carouselTrack.classList.remove('spinning-land');
     }
   }
 }
@@ -247,26 +247,20 @@ function renderSlotMachine(suggestions) {
   const carouselTrack = suggestionsDiv.querySelector('.carousel-track');
   if (!carouselTrack) return;
 
-  // 1. Get the current computed transform value
-  const currentTransform = window.getComputedStyle(carouselTrack).transform;
-
-  // 2. Remove all animation classes immediately
-  carouselTrack.classList.remove('spinning-continuous');
+  // Remove landing animation if it exists
   carouselTrack.classList.remove('spinning-land');
+  
+  // Keep continuous spinning while updating content
+  carouselTrack.classList.add('spinning-continuous');
 
-  // 3. Set the CSS variable for the landing animation's starting point
-  carouselTrack.style.setProperty('--start-transform', currentTransform);
-
-  // 4. Force reflow to ensure the CSS variable is applied and recognized by the browser
-  void carouselTrack.offsetWidth;
-
-  // 5. Clear and rebuild content
+  // Clear and rebuild content
   while (carouselTrack.firstChild) {
     carouselTrack.removeChild(carouselTrack.firstChild);
   }
 
   // Add pre-roll items (blurry headshots)
-  for (let i = 0; i < 20; i++) {
+  const preRollCount = 20;
+  for (let i = 0; i < preRollCount; i++) {
     const item = document.createElement('div');
     item.className = 'item gray';
     const img = document.createElement('img');
@@ -292,7 +286,8 @@ function renderSlotMachine(suggestions) {
   carouselTrack.appendChild(targetItem);
 
   // Add post-roll items (blurry headshots)
-  for (let i = 0; i < 20; i++) {
+  const postRollCount = 20;
+  for (let i = 0; i < postRollCount; i++) {
     const item = document.createElement('div');
     item.className = 'item gray';
     const img = document.createElement('img');
@@ -303,19 +298,31 @@ function renderSlotMachine(suggestions) {
     carouselTrack.appendChild(item);
   }
 
-  // 6. Add landing animation class
-  carouselTrack.classList.add('spinning-land');
+  // Wait a short moment before starting the landing animation
+  setTimeout(() => {
+    // Remove continuous spinning
+    carouselTrack.classList.remove('spinning-continuous');
+    
+    // Add landing animation
+    carouselTrack.classList.add('spinning-land');
 
-  // 7. Add an event listener to lock the final position
-  const onAnimationEnd = () => {
-    carouselTrack.style.transform = window.getComputedStyle(carouselTrack).transform;
-    carouselTrack.classList.remove('spinning-land');
-    carouselTrack.removeEventListener('animationend', onAnimationEnd);
-    carouselTrack.classList.add('winner-glow');
-    targetItem.addEventListener('click', () => selectSuggestion(targetSuggestion));
-  };
+    // Add an event listener to lock the final position
+    const onAnimationEnd = () => {
+      // Calculate the exact position to center the winner
+      const itemWidth = 150; // Width of each item
+      const centerOffset = (carouselTrack.offsetWidth - itemWidth) / 2;
+      const targetPosition = preRollCount * itemWidth;
+      
+      // Set the final transform to center the winner
+      carouselTrack.style.transform = `translateX(-${targetPosition}px)`;
+      carouselTrack.classList.remove('spinning-land');
+      carouselTrack.removeEventListener('animationend', onAnimationEnd);
+      carouselTrack.classList.add('winner-glow');
+      targetItem.addEventListener('click', () => selectSuggestion(targetSuggestion));
+    };
 
-  carouselTrack.addEventListener('animationend', onAnimationEnd);
+    carouselTrack.addEventListener('animationend', onAnimationEnd);
+  }, 500); // Short delay before landing
 }
 
 async function showAvatar(username) {
