@@ -141,6 +141,7 @@ button:hover {
   justify-content: center;
   transition: transform 1.5s cubic-bezier(0.4,0,0.2,1);
   z-index: 2;
+  margin-top: 0;
 }
 
 #username-form.suggestions-active {
@@ -339,8 +340,10 @@ button:hover {
 .hand-point {
   width: 180px;
   height: auto;
-  transform: rotate(90deg);
-  margin-bottom: 40px;
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(90deg);
   opacity: 1;
   transition: opacity 0.5s ease;
   z-index: 1000;
@@ -354,12 +357,12 @@ button:hover {
 
 @keyframes hoverUpDown {
   0% {
-    transform: rotate(90deg) translateX(0);
+    transform: translate(-50%, -50%) rotate(90deg) translateX(0);
   }
   50% {
-    transform: rotate(90deg) translateX(-20px);
+    transform: translate(-50%, -50%) rotate(90deg) translateX(-20px);
   }
   100% {
-    transform: rotate(90deg) translateX(0);
+    transform: translate(-50%, -50%) rotate(90deg) translateX(0);
   }
 }
