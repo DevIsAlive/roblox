@@ -694,7 +694,7 @@ button:hover {
     transform: translateX(-2400px);
   }
   100% {
-    transform: translateX(-3720px); /* Adjusted to land exactly on center */
+    transform: translateX(-2500px); /* Adjusted to land exactly on center */
   }
 }
 
