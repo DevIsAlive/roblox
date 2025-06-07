@@ -311,16 +311,14 @@ function renderSlotMachine(suggestions) {
       // Calculate the exact position to center the winner
       const itemWidth = 150; // Width of each item
       const centerOffset = (carouselTrack.offsetWidth - itemWidth) / 2;
-      // Calculate the exact position to center the winner
-      const targetPosition = preRollCount * itemWidth;
+      // Adjust the target position to account for the exact number of items to scroll
+      const targetPosition = (preRollCount - 2) * itemWidth; // Subtract 2 to land exactly on the target
       
       // Set the final transform to center the winner
       carouselTrack.style.transform = `translateX(-${targetPosition}px)`;
       carouselTrack.classList.remove('spinning-land');
       carouselTrack.removeEventListener('animationend', onAnimationEnd);
-      
-      // Add winner glow to the target item instead of the track
-      targetItem.classList.add('winner-glow');
+      carouselTrack.classList.add('winner-glow');
       targetItem.addEventListener('click', () => selectSuggestion(targetSuggestion));
     };
 
