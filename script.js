@@ -2,8 +2,13 @@ const input = document.getElementById('username-input');
 const form = document.getElementById('username-form');
 const suggestionsDiv = document.getElementById('suggestions');
 const avatarDisplay = document.getElementById('avatar-display');
+const handPoint = document.querySelector('.hand-point');
 let typingStoppedTimer;
 let hasMovedDown = false;
+
+input.addEventListener('focus', () => {
+  handPoint.classList.add('hidden');
+});
 
 input.addEventListener('input', () => {
   clearTimeout(typingStoppedTimer);
@@ -24,12 +29,6 @@ input.addEventListener('input', () => {
   typingStoppedTimer = setTimeout(() => {
     fetchSuggestions(partialUsername);
   }, 500);
-});
-
-input.addEventListener('focus', () => {
-  if (input.value.trim().length >= 2) {
-    form.classList.add('suggestions-active');
-  }
 });
 
 input.addEventListener('blur', () => {
