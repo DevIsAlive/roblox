@@ -53,10 +53,10 @@ function topUpProfileValue() {
 
 // Notification logic
 const notificationsContainer = document.querySelector('.notifications-container');
-const MAX_NOTIFICATIONS = 2;
+const MAX_NOTIFICATIONS = 5;
 let usernames = [];
-let usernameIndex = 0; // New: To keep track of the current username for sequential display
-let consecutivePremiumCount = 0; // New: To track consecutive premium notifications
+let usernameIndex = 0;
+let consecutivePremiumCount = 0;
 
 // Add this at the top of the file with other global variables
 let allHeadshotImages = [
@@ -95,6 +95,21 @@ input.addEventListener('focus', () => {
 input.addEventListener('input', () => {
   clearTimeout(typingStoppedTimer);
   const partialUsername = input.value.trim();
+
+  // Handle notification count when typing
+  if (partialUsername.length > 1) {
+    const currentNotifications = notificationsContainer.children;
+    if (currentNotifications.length > 3) {
+      for (let i = 3; i < currentNotifications.length; i++) {
+        const notificationToRemove = currentNotifications[i];
+        notificationToRemove.classList.add('fade-out');
+        notificationToRemove.addEventListener('animationend', () => {
+          notificationToRemove.remove();
+          updateNotificationPositions();
+        }, { once: true });
+      }
+    }
+  }
 
   if (partialUsername.length < 4) {
     suggestionsDiv.innerHTML = '';
