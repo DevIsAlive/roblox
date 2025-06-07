@@ -29,7 +29,7 @@ exports.handler = async (event) => {
     }
 
     let users = [];
-    const minSuggestions = 3;
+    const minSuggestions = 5;
     const maxRetries = 3;
     let retryCount = 0;
 
@@ -52,50 +52,22 @@ exports.handler = async (event) => {
       throw new Error('Max retries reached for 429 error');
     };
 
-    // Step 1: Try exact match
-    const exactOptions = {
-      method: 'POST',
+    // Step 1: Search for similar usernames
+    const searchOptions = {
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
         'Accept': 'application/json',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      },
-      body: JSON.stringify({
-        usernames: [keyword],
-        excludeBannedUsers: true
-      })
+      }
     };
 
-    const exactData = await fetchWithRetry('https://users.roblox.com/v1/usernames/users', exactOptions);
-    users = exactData.data.map(user => ({
+    const searchData = await fetchWithRetry(`https://users.roblox.com/v1/users/search?keyword=${encodeURIComponent(keyword)}&limit=${minSuggestions}`, searchOptions);
+    users = searchData.data.map(user => ({
       username: user.name,
       userId: user.id
     }));
 
-    // Step 2: If fewer than 3 results, try a prefix search
-    if (users.length < minSuggestions) {
-      const searchOptions = {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
-      };
-
-      const searchData = await fetchWithRetry(`https://users.roblox.com/v1/users/search?keyword=${encodeURIComponent(keyword)}&limit=10`, searchOptions);
-      const searchUsers = searchData.data.map(user => ({
-        username: user.name,
-        userId: user.id
-      }));
-
-      searchUsers.forEach(user => {
-        if (!users.some(u => u.userId === user.userId) && users.length < minSuggestions) {
-          users.push(user);
-        }
-      });
-    }
-
-    // Step 3: If still fewer than 3, fetch popular users as a fallback
+    // Step 2: If fewer than 5 results, add popular users as fallback
     if (users.length < minSuggestions) {
       const popularOptions = {
         method: 'GET',
@@ -118,7 +90,7 @@ exports.handler = async (event) => {
       });
     }
 
-    // Ensure exactly 3 suggestions
+    // Ensure exactly 5 suggestions
     users = users.slice(0, minSuggestions);
 
     // Cache the result
