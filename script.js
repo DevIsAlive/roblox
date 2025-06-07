@@ -312,12 +312,20 @@ function renderSlotMachine(suggestions) {
     carouselTrack.appendChild(item);
   }
 
-  // 6. Add landing animation class
+  // 6. Calculate the exact position to land on the center
+  const itemWidth = 110; // Width of item (100px) + margin (10px)
+  const centerOffset = Math.floor(carouselTrack.children.length / 2) * itemWidth;
+  const landingPosition = -centerOffset + (window.innerWidth / 2 - itemWidth / 2);
+
+  // 7. Set the landing position
+  carouselTrack.style.setProperty('--landing-position', `${landingPosition}px`);
+
+  // 8. Add landing animation class
   carouselTrack.classList.add('spinning-land');
 
-  // 7. Add an event listener to lock the final position
+  // 9. Add an event listener to lock the final position
   const onAnimationEnd = () => {
-    carouselTrack.style.transform = window.getComputedStyle(carouselTrack).transform;
+    carouselTrack.style.transform = `translateX(${landingPosition}px)`;
     carouselTrack.classList.remove('spinning-land');
     carouselTrack.removeEventListener('animationend', onAnimationEnd);
     carouselTrack.classList.add('winner-glow');
