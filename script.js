@@ -461,26 +461,29 @@ function addNotification() {
   if (isPremium) {
     newNotification.classList.add('premium');
   }
-  notificationsContainer.appendChild(newNotification);
+
+  // Check current notification count before adding new one
+  const currentNotifications = notificationsContainer.children;
+  const maxAllowed = input.value.length > 1 ? 3 : 5; // Use 3 if typing, 5 if not
+
+  // If we're at the limit, remove the oldest notification first
+  if (currentNotifications.length >= maxAllowed) {
+    const oldestNotification = currentNotifications[0];
+    oldestNotification.classList.add('fade-out');
+    oldestNotification.addEventListener('animationend', () => {
+      oldestNotification.remove();
+      // Add the new notification after removing the old one
+      notificationsContainer.appendChild(newNotification);
+      updateNotificationPositions();
+    }, { once: true });
+  } else {
+    // If we're under the limit, just add the new notification
+    notificationsContainer.appendChild(newNotification);
+    updateNotificationPositions();
+  }
 
   // DEDUCT FROM PROFILE VALUE
   updateProfileValue(randomValue);
-
-  // Manage the number of notifications
-  const currentNotifications = notificationsContainer.children;
-  if (currentNotifications.length >= MAX_NOTIFICATIONS) { // Check if at or over limit
-    const oldestNotification = currentNotifications[0];
-    oldestNotification.classList.add('fade-out');
-    // Add a listener to remove the element after the animation completes
-    oldestNotification.addEventListener('animationend', () => {
-      oldestNotification.remove();
-      // After removal, reposition existing notifications smoothly
-      updateNotificationPositions();
-    }, { once: true });
-  }
-
-  // Ensure new notification is positioned correctly from the start
-  updateNotificationPositions();
 }
 
 function updateNotificationPositions() {
