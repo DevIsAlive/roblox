@@ -24,6 +24,9 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
   const username = input.value.trim();
   if (username) {
+    // Hide suggestions when "Show Avatar" button is clicked
+    suggestionsDiv.innerHTML = '';
+    suggestionsDiv.classList.remove('show');
     showAvatar(username);
   }
 });
@@ -72,13 +75,14 @@ function displaySuggestions(users, thumbnailMap) {
     div.addEventListener('click', () => {
       suggestionsDiv.innerHTML = '';
       suggestionsDiv.classList.remove('show');
-      showAvatar(user.username); // Directly show the avatar
+      showAvatar(user.username);
     });
     suggestionsDiv.appendChild(div);
   });
 }
 
 async function showAvatar(username) {
+  // Clear previous content and prepare for loading
   avatarDisplay.innerHTML = '';
   const tempDiv = document.createElement('div');
   tempDiv.style.opacity = '0';
@@ -96,7 +100,20 @@ async function showAvatar(username) {
     const thumbnailResponse = await fetch(`/.netlify/functions/getThumbnails?userIds=${userId}&size=150x150`);
     const thumbnailData = await thumbnailResponse.json();
     const thumbnailUrl = thumbnailData.data[0].imageUrl;
-    avatarDisplay.innerHTML = `<img src="${thumbnailUrl}" alt="${username}'s avatar">`;
+
+    // Create the image element with the same fade-in animation
+    const img = document.createElement('img');
+    img.src = thumbnailUrl;
+    img.alt = `${username}'s avatar`;
+    img.style.opacity = '0'; // Start with opacity 0 for animation
+    avatarDisplay.innerHTML = ''; // Clear the loading message
+    avatarDisplay.appendChild(img);
+
+    // Trigger the fade-in animation
+    setTimeout(() => {
+      img.style.opacity = '1';
+      img.style.transition = 'opacity 0.5s ease-in-out'; // Match the CSS @keyframes fadeIn
+    }, 0);
   } catch (error) {
     console.error('Error showing avatar:', error);
     avatarDisplay.innerHTML = '<p class="error">Error loading avatar 😔</p>';
