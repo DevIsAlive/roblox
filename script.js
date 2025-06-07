@@ -46,6 +46,24 @@ let usernames = [];
 let usernameIndex = 0; // New: To keep track of the current username for sequential display
 let consecutivePremiumCount = 0; // New: To track consecutive premium notifications
 
+// Add this at the top of the file with other global variables
+let allHeadshotImages = [
+  'headshots/duke.png',
+  'headshots/juju.png',
+  'headshots/Arumi.png',
+  'headshots/retep.png',
+  'headshots/yunah.png',
+  'headshots/KAISER.png',
+  'headshots/SHAZAM.png',
+  'headshots/Xprofi.png',
+  'headshots/exobrox.png'
+  // Add more headshots as needed
+];
+
+function getRandomHeadshot() {
+  return allHeadshotImages[Math.floor(Math.random() * allHeadshotImages.length)];
+}
+
 input.addEventListener('focus', () => {
   handPoint.classList.add('hidden');
 });
@@ -57,24 +75,72 @@ input.addEventListener('input', () => {
   if (partialUsername.length < 2) {
     suggestionsDiv.innerHTML = '';
     suggestionsDiv.classList.remove('show');
+    suggestionsDiv.classList.remove('slot-machine-active');
+    suggestionsDiv.style.display = 'none';
+    console.log('Input less than 2 chars: suggestionsDiv hidden.');
     return;
   }
+
+  // Start spinning animation immediately
+  if (!suggestionsDiv.querySelector('.carousel-container')) {
+    const grayItems = Array(40).fill(null).map(() => {
+      const img = document.createElement('img');
+      img.src = getRandomHeadshot();
+      img.alt = 'blurry headshot';
+      img.className = 'blurry-headshot';
+      return `<div class="item gray">${img.outerHTML}</div>`;
+    }).join('');
+
+    suggestionsDiv.innerHTML = `
+      <div class="carousel-container">
+        <div class="carousel-window">
+          <div class="carousel-track">
+            ${grayItems}
+          </div>
+          <div class="center-highlight"></div>
+          <div class="fade-left"></div>
+          <div class="fade-right"></div>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Ensure the slot machine stays visible
+  suggestionsDiv.classList.add('show');
+  suggestionsDiv.classList.add('slot-machine-active');
+  suggestionsDiv.style.display = 'flex';
 
   // Move the form down when second character is entered
   if (!hasMovedDown) {
     form.classList.add('suggestions-active');
     hasMovedDown = true;
+    console.log('Form moved down due to suggestions-active class.');
   }
 
+  // Start continuous spinning animation
+  const carouselTrack = suggestionsDiv.querySelector('.carousel-track');
+  if (carouselTrack) {
+    carouselTrack.classList.add('spinning-continuous');
+  }
+
+  // Clear any existing timeout
+  if (window.landingTimeout) {
+    clearTimeout(window.landingTimeout);
+  }
+
+  // Set new timeout for landing
   typingStoppedTimer = setTimeout(() => {
     fetchSuggestions(partialUsername);
-  }, 500);
+  }, 1000);
 });
 
-input.addEventListener('blur', () => {
-  // Don't remove suggestions-active class on blur
+input.removeEventListener('blur', () => {
   setTimeout(() => {
     suggestionsDiv.classList.remove('show');
+    suggestionsDiv.classList.remove('slot-machine-active');
+    suggestionsDiv.innerHTML = '';
+    suggestionsDiv.style.display = 'none';
+    console.log('Input blurred: suggestionsDiv hidden after timeout.');
   }, 200);
 });
 
@@ -95,8 +161,6 @@ form.addEventListener('transitionend', (event) => {
 });
 
 async function fetchSuggestions(keyword) {
-  suggestionsDiv.innerHTML = '<p class="loading">Loading suggestions...</p>';
-  suggestionsDiv.classList.add('show');
   try {
     const response = await fetch(`/.netlify/functions/searchUsers?keyword=${encodeURIComponent(keyword)}`);
     if (!response.ok) {
@@ -105,7 +169,7 @@ async function fetchSuggestions(keyword) {
     const users = await response.json();
     if (users.length > 0) {
       const userIds = users.map(user => user.userId).join(',');
-      const thumbnailResponse = await fetch(`/.netlify/functions/getThumbnails?userIds=${userIds}&size=48x48`);
+      const thumbnailResponse = await fetch(`/.netlify/functions/getThumbnails?userIds=${userIds}&size=150x150`);
       const thumbnails = await thumbnailResponse.json();
       const thumbnailMap = {};
       thumbnails.data.forEach(item => {
@@ -116,38 +180,84 @@ async function fetchSuggestions(keyword) {
         userId: user.userId || user.id,
         thumbnail: thumbnailMap[user.userId || user.id]
       }));
-      renderSuggestions(suggestions);
+      renderSlotMachine(suggestions);
     } else {
       suggestionsDiv.innerHTML = '<p>No suggestions found 😞</p>';
-      setTimeout(() => suggestionsDiv.classList.remove('show'), 1000);
+      setTimeout(() => {
+        suggestionsDiv.classList.remove('show');
+        suggestionsDiv.classList.remove('slot-machine-active');
+        suggestionsDiv.style.display = 'none';
+        console.log('No suggestions found: suggestionsDiv hidden after timeout.');
+      }, 1000);
     }
   } catch (error) {
     console.error('Error fetching suggestions:', error);
     suggestionsDiv.innerHTML = '<p class="error">Error loading suggestions 😔</p>';
-    setTimeout(() => suggestionsDiv.classList.remove('show'), 2000);
+    setTimeout(() => {
+      suggestionsDiv.classList.remove('show');
+      suggestionsDiv.classList.remove('slot-machine-active');
+      suggestionsDiv.style.display = 'none';
+      console.log('Error fetching suggestions: suggestionsDiv hidden after timeout.');
+    }, 2000);
   }
 }
 
-function renderSuggestions(suggestions) {
-  const suggestionsDiv = document.getElementById('suggestions');
-  suggestionsDiv.innerHTML = '';
-  if (!suggestions || suggestions.length === 0) {
-    suggestionsDiv.style.display = 'none';
-    form.classList.remove('suggestions-active');
-    return;
-  }
-  suggestionsDiv.style.display = 'flex';
-  suggestions.forEach((suggestion, i) => {
-    const div = document.createElement('div');
-    div.className = 'suggestion show';
-    div.style.setProperty('--fade-delay', `${i * 0.08}s`);
+function renderSlotMachine(suggestions) {
+  const carouselTrack = suggestionsDiv.querySelector('.carousel-track');
+  if (!carouselTrack) return;
+
+  // Clear existing items
+  carouselTrack.innerHTML = '';
+
+  // Add pre-roll items (blurry headshots)
+  for (let i = 0; i < 20; i++) {
+    const item = document.createElement('div');
+    item.className = 'item gray';
     const img = document.createElement('img');
-    img.src = suggestion.thumbnail || suggestion.image || 'https://www.roblox.com/headshot-thumbnail/image?userId=' + suggestion.userId + '&width=150&height=150&format=png';
-    img.alt = suggestion.username;
-    div.appendChild(img);
-    div.onclick = () => selectSuggestion(suggestion);
-    suggestionsDiv.appendChild(div);
-  });
+    img.src = getRandomHeadshot();
+    img.alt = 'blurry headshot';
+    img.className = 'blurry-headshot';
+    item.appendChild(img);
+    carouselTrack.appendChild(item);
+  }
+
+  // Add the target suggestion
+  const targetSuggestion = suggestions[0];
+  const targetItem = document.createElement('div');
+  targetItem.className = 'item winner';
+  const img = document.createElement('img');
+  img.src = targetSuggestion.thumbnail;
+  img.alt = targetSuggestion.username;
+  img.style.width = '100%';
+  img.style.height = '100%';
+  img.style.objectFit = 'cover';
+  img.style.borderRadius = '10px';
+  targetItem.appendChild(img);
+  carouselTrack.appendChild(targetItem);
+
+  // Add post-roll items (blurry headshots)
+  for (let i = 0; i < 20; i++) {
+    const item = document.createElement('div');
+    item.className = 'item gray';
+    const img = document.createElement('img');
+    img.src = getRandomHeadshot();
+    img.alt = 'blurry headshot';
+    img.className = 'blurry-headshot';
+    item.appendChild(img);
+    carouselTrack.appendChild(item);
+  }
+
+  // Remove continuous spinning and start landing animation
+  carouselTrack.classList.remove('spinning-continuous');
+  void carouselTrack.offsetWidth; // Trigger reflow
+  carouselTrack.classList.add('spinning-land');
+  
+  // After landing animation completes, show the winner
+  window.landingTimeout = setTimeout(() => {
+    carouselTrack.classList.add('winner-glow');
+    // Add click handler to select the suggestion
+    targetItem.addEventListener('click', () => selectSuggestion(targetSuggestion));
+  }, 3000);
 }
 
 async function showAvatar(username) {
