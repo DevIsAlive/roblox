@@ -202,3 +202,11 @@ button:hover {
     padding-right: 16px;
   }
 }
+
+#username-form {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
