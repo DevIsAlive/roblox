@@ -66,11 +66,11 @@ button:hover {
 .suggestions {
   position: absolute;
   left: 50%;
-  bottom: 100%;
+  top: 0;
+  transform: translate(-50%, -120px);
   display: flex;
   flex-direction: row;
   gap: 24px;
-  transform: translateX(-50%);
   background: none;
   box-shadow: none;
   border: none;
@@ -212,4 +212,32 @@ button:hover {
 
 #username-form.suggestions-active {
   transform: translateY(90px);
+}
+
+.top-gradient-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 140px;
+  z-index: 100;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 0%, #e3f0ff 0%, #90caf9 60%, #1976d2 100%, transparent 100%);
+  opacity: 0.7;
+  animation: topGradFloat 6s ease-in-out infinite alternate;
+}
+
+@keyframes topGradFloat {
+  0% {
+    background-position: 50% 0%;
+    filter: blur(0px);
+  }
+  50% {
+    background-position: 55% 10%;
+    filter: blur(2px);
+  }
+  100% {
+    background-position: 50% 0%;
+    filter: blur(0px);
+  }
 }

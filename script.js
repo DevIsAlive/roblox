@@ -11,7 +11,6 @@ input.addEventListener('input', () => {
   if (partialUsername.length < 2) {
     suggestionsDiv.innerHTML = '';
     suggestionsDiv.classList.remove('show');
-    form.classList.remove('suggestions-active');
     return;
   }
 
@@ -28,12 +27,6 @@ input.addEventListener('focus', () => {
   if (input.value.trim().length >= 2) {
     form.classList.add('suggestions-active');
   }
-});
-
-input.addEventListener('blur', () => {
-  setTimeout(() => {
-    form.classList.remove('suggestions-active');
-  }, 200);
 });
 
 form.addEventListener('submit', (e) => {
@@ -86,7 +79,6 @@ function renderSuggestions(suggestions) {
   suggestionsDiv.innerHTML = '';
   if (!suggestions || suggestions.length === 0) {
     suggestionsDiv.style.display = 'none';
-    form.classList.remove('suggestions-active');
     return;
   }
   suggestionsDiv.style.display = 'flex';
