@@ -305,7 +305,10 @@ function renderSlotMachine(suggestions) {
     
     // Calculate the target position
     const itemWidth = 150; // Width of each item
-    const targetPosition = (preRollCount - 2) * itemWidth;
+    const viewportWidth = window.innerWidth;
+    const carouselWidth = carouselTrack.offsetWidth;
+    const centerOffset = (carouselWidth - itemWidth) / 2;
+    const targetPosition = (preRollCount - 2) * itemWidth - centerOffset;
     
     // Reset any existing transform
     carouselTrack.style.transform = 'translateX(0)';
