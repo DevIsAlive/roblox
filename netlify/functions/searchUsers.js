@@ -60,13 +60,7 @@ exports.handler = async (event) => {
       throw new Error('Max retries reached for 429 error');
     };
 
-    // Step 1: Generate username variations and search using /v1/usernames/users
-    let usernameVariations = [
-      sanitizedKeyword,
-      `${sanitizedKeyword}1`,
-      `${sanitizedKeyword}2`
-    ];
-
+    // Step 1: Search for the exact username
     const searchOptions = {
       method: 'POST',
       headers: {
@@ -75,18 +69,49 @@ exports.handler = async (event) => {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
       },
       body: JSON.stringify({
-        usernames: usernameVariations,
+        usernames: [sanitizedKeyword],
         excludeBannedUsers: true
       })
     };
-
     const searchData = await fetchWithRetry('https://users.roblox.com/v1/usernames/users', searchOptions);
     users = searchData.data.map(user => ({
       username: user.name,
       userId: user.id
     }));
 
-    // No fallback to popular users. Only return up to 3 suggestions.
+    // 2. If fewer than 3, get similar usernames from the suggestions endpoint
+    if (users.length < minSuggestions) {
+      const suggestRes = await fetch(`https://users.roblox.com/v1/usernames/suggestions?name=${encodeURIComponent(sanitizedKeyword)}&count=${minSuggestions}`);
+      if (suggestRes.ok) {
+        const suggestData = await suggestRes.json();
+        const suggestionNames = suggestData.suggestions || [];
+        // Remove any already found usernames
+        const uniqueNames = suggestionNames.filter(name => !users.some(u => u.username.toLowerCase() === name.toLowerCase()));
+        // Fetch user info for these suggestions
+        if (uniqueNames.length > 0) {
+          const suggestOptions = {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            },
+            body: JSON.stringify({
+              usernames: uniqueNames.slice(0, minSuggestions - users.length),
+              excludeBannedUsers: true
+            })
+          };
+          const suggestUserData = await fetchWithRetry('https://users.roblox.com/v1/usernames/users', suggestOptions);
+          const moreUsers = suggestUserData.data.map(user => ({
+            username: user.name,
+            userId: user.id
+          }));
+          users = users.concat(moreUsers);
+        }
+      }
+    }
+
+    // Only return up to 3 suggestions
     users = users.slice(0, minSuggestions);
 
     // Cache the result
