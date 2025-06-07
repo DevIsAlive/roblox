@@ -16,8 +16,20 @@ function updateProfileValue(amount) {
   profileValueSpan.textContent = currentProfileValue.toLocaleString(); // Format with commas
   profileValueSpan.setAttribute('data-text', currentProfileValue.toLocaleString()); // Update data-text for shadow
 
-  // Check for top-up condition: if current value drops below 250,000
-  if (currentProfileValue < 250000) {
+  // Remove existing pulsing classes
+  profileValueSpan.classList.remove('pulse-subtle', 'pulse-medium', 'pulse-strong');
+
+  // Apply pulsing based on value
+  if (currentProfileValue < 10000) {
+    profileValueSpan.classList.add('pulse-strong');
+  } else if (currentProfileValue < 50000) {
+    profileValueSpan.classList.add('pulse-medium');
+  } else if (currentProfileValue < 100000) {
+    profileValueSpan.classList.add('pulse-subtle');
+  }
+
+  // Check for top-up condition: if current value drops below 10,000
+  if (currentProfileValue < 10000) {
     topUpProfileValue();
     // No need to reset lastTopUpValue here, as the condition is based on absolute value
   }
