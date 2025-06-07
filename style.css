@@ -69,7 +69,7 @@ button:hover {
   bottom: 100%;
   display: flex;
   flex-direction: row;
-  gap: 16px;
+  gap: 24px;
   transform: translateX(-50%);
   background: none;
   box-shadow: none;
@@ -88,17 +88,17 @@ button:hover {
   flex-direction: column;
   align-items: center;
   background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-  padding: 16px 18px 12px 18px;
-  min-width: 90px;
-  min-height: 90px;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  padding: 28px 32px 20px 32px;
+  min-width: 140px;
+  min-height: 140px;
   cursor: pointer;
   opacity: 0;
   transform: translateY(20px);
   animation: fadeUp 0.4s ease forwards;
   animation-delay: var(--fade-delay, 0s);
-  border: 1.5px solid #e3f0ff;
+  border: 2.5px solid #e3f0ff;
   transition: box-shadow 0.2s, border 0.2s, background 0.2s;
 }
 
@@ -107,17 +107,17 @@ button:hover {
 }
 
 .suggestion img {
-  width: 40px;
-  height: 40px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  margin-bottom: 8px;
+  margin-bottom: 14px;
   background: #e3f0ff;
   object-fit: cover;
 }
 
 .suggestion .username {
-  font-weight: 600;
-  font-size: 1rem;
+  font-weight: 700;
+  font-size: 1.15rem;
   color: #222;
   text-align: center;
   margin: 0;
@@ -207,4 +207,9 @@ button:hover {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  transition: transform 1.2s cubic-bezier(0.4,0,0.2,1);
+}
+
+#username-form.suggestions-active {
+  transform: translateY(90px);
 }
