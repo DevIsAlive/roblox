@@ -11,12 +11,8 @@ input.addEventListener('input', () => {
   if (partialUsername.length < 2) {
     suggestionsDiv.innerHTML = '';
     suggestionsDiv.classList.remove('show');
-    form.classList.remove('suggestions-active');
     return;
   }
-
-  // Immediately shift the bar down as soon as user types enough characters
-  form.classList.add('suggestions-active');
 
   // Show suggestions only after 500ms of inactivity
   typingStoppedTimer = setTimeout(() => {
@@ -26,13 +22,13 @@ input.addEventListener('input', () => {
 
 input.addEventListener('focus', () => {
   if (input.value.trim().length >= 2) {
-    form.classList.add('suggestions-active');
+    suggestionsDiv.classList.add('show');
   }
 });
 
 input.addEventListener('blur', () => {
   setTimeout(() => {
-    form.classList.remove('suggestions-active');
+    suggestionsDiv.classList.remove('show');
   }, 200);
 });
 
