@@ -337,7 +337,7 @@ button:hover {
 }
 
 .hand-point {
-  width: 120px;
+  width: 180px;
   height: auto;
   transform: rotate(90deg);
   margin-bottom: 40px;
