@@ -72,12 +72,12 @@ input.addEventListener('input', () => {
   clearTimeout(typingStoppedTimer);
   const partialUsername = input.value.trim();
 
-  if (partialUsername.length < 2) {
+  if (partialUsername.length < 4) {
     suggestionsDiv.innerHTML = '';
     suggestionsDiv.classList.remove('show');
     suggestionsDiv.classList.remove('slot-machine-active');
     suggestionsDiv.style.display = 'none';
-    console.log('Input less than 2 chars: suggestionsDiv hidden.');
+    console.log('Input less than 4 chars: suggestionsDiv hidden.');
     return;
   }
 
@@ -110,7 +110,7 @@ input.addEventListener('input', () => {
   suggestionsDiv.classList.add('slot-machine-active');
   suggestionsDiv.style.display = 'flex';
 
-  // Move the form down when second character is entered
+  // Move the form down when fourth character is entered
   if (!hasMovedDown) {
     form.classList.add('suggestions-active');
     hasMovedDown = true;
@@ -182,23 +182,19 @@ async function fetchSuggestions(keyword) {
       }));
       renderSlotMachine(suggestions);
     } else {
-      suggestionsDiv.innerHTML = '<p>No suggestions found 😞</p>';
-      setTimeout(() => {
-        suggestionsDiv.classList.remove('show');
-        suggestionsDiv.classList.remove('slot-machine-active');
-        suggestionsDiv.style.display = 'none';
-        console.log('No suggestions found: suggestionsDiv hidden after timeout.');
-      }, 1000);
+      // Instead of showing "no suggestions found", keep spinning
+      const carouselTrack = suggestionsDiv.querySelector('.carousel-track');
+      if (carouselTrack) {
+        carouselTrack.classList.add('spinning-continuous');
+      }
     }
   } catch (error) {
     console.error('Error fetching suggestions:', error);
-    suggestionsDiv.innerHTML = '<p class="error">Error loading suggestions 😔</p>';
-    setTimeout(() => {
-      suggestionsDiv.classList.remove('show');
-      suggestionsDiv.classList.remove('slot-machine-active');
-      suggestionsDiv.style.display = 'none';
-      console.log('Error fetching suggestions: suggestionsDiv hidden after timeout.');
-    }, 2000);
+    // On error, keep spinning
+    const carouselTrack = suggestionsDiv.querySelector('.carousel-track');
+    if (carouselTrack) {
+      carouselTrack.classList.add('spinning-continuous');
+    }
   }
 }
 
