@@ -246,6 +246,12 @@ function renderSlotMachine(suggestions) {
   // Remove continuous spinning and start landing animation
   carouselTrack.classList.remove('spinning-continuous');
   void carouselTrack.offsetWidth; // Trigger reflow
+  
+  // Reset position before starting landing animation
+  carouselTrack.style.transform = 'translateX(-2400px)';
+  void carouselTrack.offsetWidth; // Trigger reflow again
+  
+  // Start landing animation
   carouselTrack.classList.add('spinning-land');
   
   // After landing animation completes, show the winner
