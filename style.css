@@ -158,3 +158,24 @@ button:hover {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+.center-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: none;
+}
+
+@media (max-width: 600px) {
+  .center-container {
+    padding: 0;
+  }
+}
