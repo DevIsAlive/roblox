@@ -602,8 +602,7 @@ button:hover {
   height: 100%;
   width: fit-content;
   align-items: center;
-  transform: translateX(-2400px);
-  transition: transform 0.3s ease;
+  /* Initial transform and transition will be handled by JS for seamless transitions */
   will-change: transform;
 }
 
@@ -691,10 +690,10 @@ button:hover {
 
 @keyframes carousel-spin-land {
   0% {
-    transform: translateX(-2400px);
+    transform: var(--start-transform); /* Use CSS variable for dynamic start */
   }
   100% {
-    transform: translateX(-2500px); /* Adjusted to land exactly on center */
+    transform: translateX(-2460px); /* Final landing position */
   }
 }
 

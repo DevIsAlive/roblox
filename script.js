@@ -186,6 +186,7 @@ async function fetchSuggestions(keyword) {
       const carouselTrack = suggestionsDiv.querySelector('.carousel-track');
       if (carouselTrack) {
         carouselTrack.classList.add('spinning-continuous');
+        carouselTrack.classList.remove('spinning-land'); // Ensure landing animation is removed
       }
     }
   } catch (error) {
@@ -194,6 +195,7 @@ async function fetchSuggestions(keyword) {
     const carouselTrack = suggestionsDiv.querySelector('.carousel-track');
     if (carouselTrack) {
       carouselTrack.classList.add('spinning-continuous');
+      carouselTrack.classList.remove('spinning-land'); // Ensure landing animation is removed
     }
   }
 }
@@ -202,10 +204,23 @@ function renderSlotMachine(suggestions) {
   const carouselTrack = suggestionsDiv.querySelector('.carousel-track');
   if (!carouselTrack) return;
 
-  // Clear existing items
-  carouselTrack.innerHTML = '';
+  // 1. Get the current computed transform value
+  const currentTransform = window.getComputedStyle(carouselTrack).transform;
 
-  // Add pre-roll items (blurry headshots)
+  // 2. Remove all animation classes immediately
+  carouselTrack.classList.remove('spinning-continuous');
+  carouselTrack.classList.remove('spinning-land');
+
+  // 3. Apply the current transform directly as an inline style to lock its position
+  carouselTrack.style.transform = currentTransform;
+  void carouselTrack.offsetWidth; // Force reflow to apply the inline style immediately
+
+  // 4. Clear existing items by removing children
+  while (carouselTrack.firstChild) {
+    carouselTrack.removeChild(carouselTrack.firstChild);
+  }
+
+  // 5. Add pre-roll items (blurry headshots)
   for (let i = 0; i < 20; i++) {
     const item = document.createElement('div');
     item.className = 'item gray';
@@ -217,7 +232,7 @@ function renderSlotMachine(suggestions) {
     carouselTrack.appendChild(item);
   }
 
-  // Add the target suggestion
+  // 6. Add the target suggestion
   const targetSuggestion = suggestions[0];
   const targetItem = document.createElement('div');
   targetItem.className = 'item winner';
@@ -231,7 +246,7 @@ function renderSlotMachine(suggestions) {
   targetItem.appendChild(img);
   carouselTrack.appendChild(targetItem);
 
-  // Add post-roll items (blurry headshots)
+  // 7. Add post-roll items (blurry headshots)
   for (let i = 0; i < 20; i++) {
     const item = document.createElement('div');
     item.className = 'item gray';
@@ -243,23 +258,19 @@ function renderSlotMachine(suggestions) {
     carouselTrack.appendChild(item);
   }
 
-  // Remove continuous spinning and start landing animation
-  carouselTrack.classList.remove('spinning-continuous');
-  void carouselTrack.offsetWidth; // Trigger reflow
-  
-  // Reset position before starting landing animation
-  carouselTrack.style.transform = 'translateX(-2400px)';
-  void carouselTrack.offsetWidth; // Trigger reflow again
-  
-  // Start landing animation
+  // 8. Add landing animation class
   carouselTrack.classList.add('spinning-land');
   
-  // After landing animation completes, show the winner
-  window.landingTimeout = setTimeout(() => {
-    carouselTrack.classList.add('winner-glow');
-    // Add click handler to select the suggestion
+  // 9. Add an event listener to lock the final position after the landing animation ends
+  const onAnimationEnd = () => {
+    carouselTrack.style.transform = window.getComputedStyle(carouselTrack).transform; // Reinstated
+    carouselTrack.classList.remove('spinning-land');
+    carouselTrack.removeEventListener('animationend', onAnimationEnd);
+    carouselTrack.classList.add('winner-glow'); // Apply glow after animation settles
     targetItem.addEventListener('click', () => selectSuggestion(targetSuggestion));
-  }, 3000);
+  };
+
+  carouselTrack.addEventListener('animationend', onAnimationEnd);
 }
 
 async function showAvatar(username) {
