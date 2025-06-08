@@ -77,7 +77,7 @@ function topUpProfileValue() {
 
 // Notification logic
 const notificationsContainer = document.querySelector('.notifications-container');
-const MAX_NOTIFICATIONS = 4;
+const MAX_NOTIFICATIONS = 3;
 let usernames = [];
 let usernameIndex = 0;
 let consecutivePremiumCount = 0;
