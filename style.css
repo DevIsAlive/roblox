@@ -845,3 +845,22 @@ button:hover {
     opacity: 1;
   }
 }
+
+/* New: Class to hide main UI elements */
+.main-ui-hidden {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  /* Using display: none directly can cause reflow issues. */
+  /* Instead, we set display:none on individual elements in JS after opacity is 0 */
+}
+
+/* Ensure present application loads on top of the blue fill screen */
+#present-app-container {
+  position: relative; /* Needs to be positioned to apply z-index */
+  z-index: 10000; /* Higher than fill-screen-circle's 9999 */
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
