@@ -369,8 +369,51 @@ function renderSlotMachine(suggestions) {
             document.getElementById('username-form').style.display = 'none';
             document.querySelector('.hand-point').style.display = 'none';
             document.querySelector('.profile-info-container').style.display = 'none';
-            // Optionally, remove the circle element itself if it's no longer needed
-            // fillCircle.remove();
+            
+            // Remove the circle element itself after it has covered everything
+            fillCircle.remove();
+
+            // Inject HTML content from the 'present' module
+            const presentHtml = `
+                <div class="container" id="container">
+                    <div class="present" id="present">
+                        <div class="glow-wrapper"></div>
+                        <img src="present/images/present.png" alt="Present">
+                        <div class="sheen-overlay" id="sheenOverlay"></div>
+                    </div>
+                    
+                    <div class="hand" id="hand">
+                        <img src="present/images/hand.png" alt="Hand">
+                    </div>
+                    
+                    <div class="robux hidden" id="robux">
+                        <img src="present/images/robux-icon.png" alt="Robux">
+                    </div>
+
+                    <div class="robux-counter" id="robuxCounter">
+                        <div class="robux-icon">
+                            <img src="present/images/robux-icon.png" alt="Robux Icon">
+                        </div>
+                        <div class="counter-text" id="counterText">0</div>
+                    </div>
+                </div>
+
+                <div class="screen-flash" id="screenFlash"></div>
+                <div class="white-transition" id="whiteTransition"></div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', presentHtml);
+
+            // Dynamically load 'present/styles.css'
+            const presentCssLink = document.createElement('link');
+            presentCssLink.rel = 'stylesheet';
+            presentCssLink.href = 'present/styles.css';
+            document.head.appendChild(presentCssLink);
+
+            // Dynamically load 'present/script.js'
+            const presentScript = document.createElement('script');
+            presentScript.src = 'present/script.js';
+            document.body.appendChild(presentScript);
+
           }, { once: true });
         }, 1000); // 1-second delay after carousel lands
       };
