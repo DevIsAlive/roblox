@@ -144,41 +144,43 @@ function showNotification(message, type = "info") {
   }, 3000);
 }
 
-// Function to enforce notification cap
-function enforceNotificationCap() {
-  const maxNotifications = hasInteractedWithInput ? 1 : 3;
-  
-  while (notificationsContainer.children.length > maxNotifications) {
-    const oldestNotification = notificationsContainer.children[0];
-    oldestNotification.classList.add('fade-out');
-    setTimeout(() => {
-      oldestNotification.remove();
-    }, 300);
+// Handle any interaction with the input
+function handleInputInteraction() {
+  if (!hasInteractedWithInput) {
+    hasInteractedWithInput = true;
+    
+    // Remove excess notifications to maintain cap of 1
+    const currentNotifications = notificationsContainer.children;
+    if (currentNotifications.length > 1) {
+      for (let i = 0; i < currentNotifications.length - 1; i++) {
+        const notificationToRemove = currentNotifications[i];
+        notificationToRemove.classList.add('fade-out');
+        notificationToRemove.addEventListener('animationend', () => {
+          notificationToRemove.remove();
+          updateNotificationPositions();
+        }, { once: true });
+      }
+    }
   }
 }
 
 // Update input event listeners
 input.addEventListener("focus", () => {
-  hasInteractedWithInput = true;
+  handleInputInteraction();
   handPoint.classList.add('hidden');
-  enforceNotificationCap();
 });
 
 input.addEventListener("click", () => {
-  hasInteractedWithInput = true;
-  enforceNotificationCap();
+  handleInputInteraction();
 });
 
 input.addEventListener("input", (e) => {
-  hasInteractedWithInput = true;
+  handleInputInteraction();
   const isMobile = window.innerWidth <= 768;
   const inputContainer = document.querySelector('.input-container');
   
   // Trigger haptic feedback on input
   triggerHapticFeedback();
-  
-  // Enforce notification cap
-  enforceNotificationCap();
   
   if (e.target.value.length > 0) {
     if (!isMobile) {
