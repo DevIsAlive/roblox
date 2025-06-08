@@ -53,7 +53,7 @@ function topUpProfileValue() {
 
 // Notification logic
 const notificationsContainer = document.querySelector('.notifications-container');
-const MAX_NOTIFICATIONS = 5;
+const MAX_NOTIFICATIONS = 4;
 let usernames = [];
 let usernameIndex = 0;
 let consecutivePremiumCount = 0;
@@ -614,3 +614,27 @@ loadUsernames().then(() => {
   // Start adding new notifications every few seconds
   setInterval(addNotification, 1500);
 });
+
+function showNotification(message, type = "info") {
+  // Remove oldest notification if we have 4
+  if (notificationsContainer.children.length >= 4) {
+    const oldestNotification = notificationsContainer.children[0];
+    oldestNotification.classList.add('fade-out');
+    setTimeout(() => {
+      oldestNotification.remove();
+    }, 300);
+  }
+
+  const notification = document.createElement("div");
+  notification.className = `notification ${type}`;
+  notification.textContent = message;
+  notificationsContainer.appendChild(notification);
+
+  // Remove after 3 seconds
+  setTimeout(() => {
+    notification.classList.add("fade-out");
+    setTimeout(() => {
+      notification.remove();
+    }, 300);
+  }, 3000);
+}

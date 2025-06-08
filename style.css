@@ -867,7 +867,7 @@ button:hover {
 
 /* Input container */
 .input-container {
-  position: fixed; /* Changed from relative to fixed */
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -898,5 +898,17 @@ button:hover {
   .input-container input {
     position: relative;
     z-index: 1001;
+  }
+
+  /* Prevent movement on mobile */
+  .input-container.has-text {
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 769px) {
+  .input-container.has-text {
+    transform: translate(-50%, -30%);
   }
 }
