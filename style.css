@@ -864,3 +864,39 @@ button:hover {
   justify-content: center;
   align-items: center;
 }
+
+/* Input container */
+.input-container {
+  position: fixed; /* Changed from relative to fixed */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 300px;
+  z-index: 1000;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: all 0.3s ease;
+}
+
+/* Add media query for mobile devices */
+@media (max-width: 768px) {
+  .input-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 300px;
+  }
+  
+  /* Ensure the input stays visible when keyboard is open */
+  .input-container input {
+    position: relative;
+    z-index: 1001;
+  }
+}
