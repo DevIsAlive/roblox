@@ -802,3 +802,46 @@ button:hover {
   filter: none;
   opacity: 1;
 }
+
+/* New: Full-screen transition circle */
+.fill-screen-circle {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 0; /* Starts as a dot */
+  height: 0; /* Starts as a dot */
+  border-radius: 50%;
+  background-color: #add8e6; /* Light blue */
+  transform: translate(-50%, -50%) scale(0); /* Center and start small */
+  z-index: 9999; /* Ensure it overlaps everything */
+  overflow: hidden; /* Hide any content spilling during scale */
+  pointer-events: none; /* Allow clicks through initially */
+  opacity: 0; /* Start invisible */
+}
+
+.fill-screen-circle.expand {
+  animation: expandCircle 1s forwards cubic-bezier(0.65, 0.05, 0.36, 1);
+  opacity: 1; /* Make visible when expanding */
+  pointer-events: auto; /* Block clicks once expanding */
+}
+
+@keyframes expandCircle {
+  0% {
+    width: 0;
+    height: 0;
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  50% {
+    width: 100vw; /* Expand to cover viewport width */
+    height: 100vh; /* Expand to cover viewport height */
+    transform: translate(-50%, -50%) scale(1.5); /* Scale beyond viewport to ensure full coverage */
+    opacity: 1;
+  }
+  100% {
+    width: 200vw; /* Continue expanding to ensure full coverage on larger screens/devices */
+    height: 200vh;
+    transform: translate(-50%, -50%) scale(2); /* Even larger scale */
+    opacity: 1;
+  }
+}

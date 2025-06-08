@@ -351,6 +351,28 @@ function renderSlotMachine(suggestions) {
         carouselTrack.removeEventListener('animationend', onAnimationEnd);
         carouselTrack.classList.add('winner-glow');
         targetItemElement.addEventListener('click', () => selectSuggestion(targetSuggestion));
+
+        // New: Start full-screen transition after a delay
+        setTimeout(() => {
+          const fillCircle = document.createElement('div');
+          fillCircle.className = 'fill-screen-circle';
+          document.body.appendChild(fillCircle);
+
+          // Force reflow to ensure initial state is applied before animation
+          void fillCircle.offsetWidth;
+
+          fillCircle.classList.add('expand');
+
+          fillCircle.addEventListener('animationend', () => {
+            // Hide other elements after the circle animation completes
+            notificationsContainer.style.display = 'none';
+            document.getElementById('username-form').style.display = 'none';
+            document.querySelector('.hand-point').style.display = 'none';
+            document.querySelector('.profile-info-container').style.display = 'none';
+            // Optionally, remove the circle element itself if it's no longer needed
+            // fillCircle.remove();
+          }, { once: true });
+        }, 1000); // 1-second delay after carousel lands
       };
 
       carouselTrack.addEventListener('animationend', onAnimationEnd);
@@ -499,7 +521,7 @@ function addNotification() {
 
   // Check current notification count before adding new one
   const currentNotifications = notificationsContainer.children;
-  const maxAllowed = input.value.length > 1 ? 3 : 5; // Use 3 if typing, 5 if not
+  const maxAllowed = input.value.length > 1 ? 2 : 5; // Changed from 3 to 2
 
   // If we're at the limit, remove the oldest notification first
   if (currentNotifications.length >= maxAllowed) {
