@@ -20,6 +20,12 @@ function updateProfileValue(amount) {
   const duration = 1000;
   const startTime = performance.now();
   
+  // Add flash red effect
+  profileValueSpan.classList.add('flash-red');
+  setTimeout(() => {
+    profileValueSpan.classList.remove('flash-red');
+  }, 500);
+  
   function updateNumber(currentTime) {
     const elapsed = currentTime - startTime;
     const progress = Math.min(elapsed / duration, 1);
