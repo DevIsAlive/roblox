@@ -292,7 +292,6 @@ class PresentAnimation {
 
   showRobux() {
     this.robux.classList.remove("hidden")
-    this.robux.classList.add("animate-robux-reveal")
 
     // Add celebration pulsing effect
     setTimeout(() => {
