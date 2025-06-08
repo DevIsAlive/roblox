@@ -303,9 +303,13 @@ function renderSlotMachine(suggestions) {
     // Remove continuous spinning
     carouselTrack.classList.remove('spinning-continuous');
     
-    // Calculate the target position
+    // Calculate the target position based on device
     const itemWidth = 150; // Width of each item
-    const targetPosition = (preRollCount - 3) * itemWidth; // Adjusted offset to land exactly on target
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    
+    // Different offset for mobile vs desktop
+    const offset = isMobile ? 4 : 3;
+    const targetPosition = (preRollCount - offset) * itemWidth;
     
     // Reset any existing transform
     carouselTrack.style.transform = 'translateX(0)';
