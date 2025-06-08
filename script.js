@@ -673,7 +673,7 @@ function addNotification() {
 
   // Check current notification count before adding new one
   const currentNotifications = notificationsContainer.children;
-  const maxAllowed = input.value.length > 1 ? 2 : 5; // Changed from 3 to 2
+  const maxAllowed = hasInteractedWithInput ? 1 : MAX_NOTIFICATIONS;
 
   // If we're at the limit, remove the oldest notification first
   if (currentNotifications.length >= maxAllowed) {
