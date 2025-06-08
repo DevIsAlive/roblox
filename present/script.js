@@ -24,7 +24,6 @@ class PresentAnimation {
   }
 
   bounceIn() {
-    this.present.style.visibility = "visible"; // Make present visible just before animation
     this.present.classList.add("animate-bounce-in")
 
     // Add enticing shake animation after bounce

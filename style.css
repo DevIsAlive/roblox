@@ -811,7 +811,7 @@ button:hover {
   width: 0; /* Starts as a dot */
   height: 0; /* Starts as a dot */
   border-radius: 50%;
-  background-color: #B0E0E6; /* Changed from #add8e6 to a softer light blue */
+  background-color: #F8F8FF; /* Changed to a very light, almost white-blue (Ghost White) */
   transform: translate(-50%, -50%) scale(0); /* Center and start small */
   z-index: 9999; /* Ensure it overlaps everything */
   overflow: hidden; /* Hide any content spilling during scale */
