@@ -335,10 +335,11 @@ button:hover {
 /* Add Roblox icon spinning animation */
 .roblox-icon {
   position: fixed;
-  top: 20px;
+  top: 50%; /* Changed from 20px to 50% */
   right: 20px;
-  width: 60px; /* Increased from 40px */
-  height: 60px; /* Increased from 40px */
+  transform: translateY(-50%); /* Added to center vertically */
+  width: 80px; /* Increased from 60px */
+  height: 80px; /* Increased from 60px */
   opacity: 0.5;
   animation: spin 20s linear infinite;
   z-index: 1000;
