@@ -382,7 +382,19 @@ function renderSlotMachine(suggestions) {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
                 const presentBodyContent = doc.body.innerHTML;
-                presentAppContainer.innerHTML = presentBodyContent;
+                
+                // Create a temporary div to parse and modify image paths
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = presentBodyContent;
+
+                const images = tempDiv.querySelectorAll('img');
+                images.forEach(img => {
+                  const currentSrc = img.getAttribute('src');
+                  if (currentSrc && currentSrc.startsWith('./images/')) {
+                    img.setAttribute('src', 'present/' + currentSrc.substring(2)); // Change ./images/ to present/images/
+                  }
+                });
+                presentAppContainer.innerHTML = tempDiv.innerHTML;
 
                 // Dynamically load present/styles.css
                 const presentStylesLink = document.createElement('link');
