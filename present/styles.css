@@ -1,0 +1,713 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  height: 100vh;
+  background: radial-gradient(circle at center, #ffffff 0%, #f0f4ff 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  font-family: "Arial", sans-serif;
+}
+
+.container {
+  position: relative;
+  width: 450px;
+  height: 450px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.present {
+  width: 280px;
+  height: 280px;
+  cursor: pointer;
+  transition: transform 0.1s ease-out;
+  position: relative;
+  z-index: 10;
+  overflow: visible; /* Allow glow to extend beyond */
+}
+
+.present img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: filter 0.3s ease;
+}
+
+.present:hover {
+  transform: scale(1.02);
+}
+
+.hand {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  top: 35%;
+  left: 60%;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.hand img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+.robux {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  opacity: 0;
+  transform: scale(0);
+  z-index: 1005;
+}
+
+.robux img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.25));
+}
+
+/* Robux Counter - Higher z-index to appear above white transition */
+.robux-counter {
+  position: fixed;
+  top: 70%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  opacity: 0;
+  z-index: 1010; /* Above white transition */
+  font-family: "Arial Black", Arial, sans-serif;
+}
+
+.robux-icon {
+  width: 40px;
+  height: 40px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.robux-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.counter-text {
+  font-size: 48px;
+  font-weight: 900;
+  color: #22c55e;
+  text-shadow: 0 0 10px rgba(34, 197, 94, 0.8), 0 0 20px rgba(34, 197, 94, 0.6), 0 0 30px rgba(34, 197, 94, 0.4), 0 4px
+    8px rgba(0, 0, 0, 0.3);
+  letter-spacing: 2px;
+  background: linear-gradient(45deg, #22c55e, #16a34a, #15803d);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes textGlow {
+  0% {
+    filter: brightness(1) drop-shadow(0 0 5px rgba(34, 197, 94, 0.5));
+  }
+  100% {
+    filter: brightness(1.2) drop-shadow(0 0 15px rgba(34, 197, 94, 0.8));
+  }
+}
+
+@keyframes counterPop {
+  0% {
+    transform: translateX(-50%) scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes numberPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Sheen effect overlay */
+.sheen-overlay {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 30%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0.4) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 15;
+  opacity: 0; /* Hidden by default */
+}
+
+/* White transition overlay */
+.white-transition {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.9) 70%,
+    rgba(255, 255, 255, 0.7) 100%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1002;
+  opacity: 0;
+}
+
+/* Glow wrapper for proper glow effects that extend beyond the present */
+.glow-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Progressive glow effects - using box-shadow for proper spreading */
+.glow-1 .glow-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.8), 0 0 80px rgba(255, 255, 255, 0.6), 0 0 120px rgba(255, 255, 255, 0.4),
+    0 0 160px rgba(255, 255, 255, 0.2);
+}
+
+.glow-2 .glow-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: 0 0 50px rgba(34, 197, 94, 0.8), 0 0 100px rgba(34, 197, 94, 0.6), 0 0 150px rgba(34, 197, 94, 0.4), 0 0
+    200px rgba(34, 197, 94, 0.2);
+}
+
+.glow-3 .glow-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: 0 0 60px rgba(59, 130, 246, 0.8), 0 0 120px rgba(59, 130, 246, 0.6), 0 0 180px rgba(59, 130, 246, 0.4), 0
+    0 240px rgba(59, 130, 246, 0.2);
+}
+
+.glow-4 .glow-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: 0 0 70px rgba(168, 85, 247, 0.9), 0 0 140px rgba(168, 85, 247, 0.7), 0 0 210px rgba(168, 85, 247, 0.5), 0
+    0 280px rgba(168, 85, 247, 0.3), 0 0 350px rgba(168, 85, 247, 0.1);
+  animation: pulsateGlow 2s infinite ease-in-out;
+}
+
+@keyframes pulsateGlow {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+/* Impact effects */
+.impact-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  border: 4px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.screen-flash {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0;
+}
+
+/* Enhanced animations */
+@keyframes bounceIn {
+  0% {
+    transform: scale(0) rotate(-15deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(8deg);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(0.9) rotate(-3deg);
+  }
+  85% {
+    transform: scale(1.05) rotate(1deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes enticingShake {
+  0%,
+  100% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+  10% {
+    transform: translateX(-1px) translateY(-0.5px) rotate(-0.5deg);
+  }
+  20% {
+    transform: translateX(1px) translateY(0.5px) rotate(0.5deg);
+  }
+  30% {
+    transform: translateX(-0.5px) translateY(1px) rotate(-0.3deg);
+  }
+  40% {
+    transform: translateX(0.5px) translateY(-1px) rotate(0.3deg);
+  }
+  50% {
+    transform: translateX(-0.8px) translateY(0.8px) rotate(-0.4deg);
+  }
+  60% {
+    transform: translateX(0.8px) translateY(-0.8px) rotate(0.4deg);
+  }
+  70% {
+    transform: translateX(-0.3px) translateY(-0.3px) rotate(-0.2deg);
+  }
+  80% {
+    transform: translateX(0.3px) translateY(0.3px) rotate(0.2deg);
+  }
+  90% {
+    transform: translateX(-0.1px) translateY(0.1px) rotate(-0.1deg);
+  }
+}
+
+@keyframes handFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes handHover {
+  0%,
+  100% {
+    transform: translate(0px, 0px) rotate(0deg);
+  }
+  25% {
+    transform: translate(2px, -4px) rotate(1deg);
+  }
+  50% {
+    transform: translate(0px, -8px) rotate(0deg);
+  }
+  75% {
+    transform: translate(-2px, -4px) rotate(-1deg);
+  }
+}
+
+@keyframes handShake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  10% {
+    transform: rotate(-2deg) translateX(-1px);
+  }
+  20% {
+    transform: rotate(2deg) translateX(1px);
+  }
+  30% {
+    transform: rotate(-1deg) translateY(-1px);
+  }
+  40% {
+    transform: rotate(1deg) translateY(1px);
+  }
+  50% {
+    transform: rotate(-1.5deg) translateX(-0.5px);
+  }
+  60% {
+    transform: rotate(1.5deg) translateX(0.5px);
+  }
+  70% {
+    transform: rotate(-0.5deg) translateY(-0.5px);
+  }
+  80% {
+    transform: rotate(0.5deg) translateY(0.5px);
+  }
+  90% {
+    transform: rotate(-0.2deg);
+  }
+}
+
+@keyframes sheenSweep {
+  0% {
+    left: -100%;
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes finalExplosion {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  30% {
+    transform: scale(1.2);
+    filter: brightness(1.5);
+  }
+  60% {
+    transform: scale(2);
+    filter: brightness(3) saturate(0);
+  }
+  100% {
+    transform: scale(8);
+    filter: brightness(10) saturate(0);
+  }
+}
+
+@keyframes whiteTransition {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+  50% {
+    width: 200vw;
+    height: 200vh;
+    opacity: 1;
+  }
+  100% {
+    width: 300vw;
+    height: 300vh;
+    opacity: 1;
+  }
+}
+
+@keyframes impactRing {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+    border-width: 8px;
+  }
+  50% {
+    opacity: 0.8;
+    border-width: 4px;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0;
+    border-width: 1px;
+  }
+}
+
+@keyframes screenShake {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  10% {
+    transform: translate(-2px, -1px);
+  }
+  20% {
+    transform: translate(2px, 1px);
+  }
+  30% {
+    transform: translate(-1px, 2px);
+  }
+  40% {
+    transform: translate(1px, -2px);
+  }
+  50% {
+    transform: translate(-2px, 1px);
+  }
+  60% {
+    transform: translate(2px, -1px);
+  }
+  70% {
+    transform: translate(-1px, -2px);
+  }
+  80% {
+    transform: translate(1px, 2px);
+  }
+  90% {
+    transform: translate(-1px, 1px);
+  }
+}
+
+@keyframes screenFlash {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes explode {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  20% {
+    transform: scale(1.2) rotate(5deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5) rotate(-8deg);
+    opacity: 0.7;
+  }
+  80% {
+    transform: scale(1.8) rotate(12deg);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(0) rotate(25deg);
+    opacity: 0;
+  }
+}
+
+@keyframes robuxReveal {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  30% {
+    transform: scale(1.4) rotate(120deg);
+    opacity: 1;
+  }
+  60% {
+    transform: scale(0.8) rotate(240deg);
+  }
+  80% {
+    transform: scale(1.1) rotate(320deg);
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+@keyframes celebrationPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+/* Enhanced confetti with realistic physics */
+.confetti {
+  position: absolute;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.confetti-rect {
+  width: 12px;
+  height: 8px;
+  background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+}
+
+.confetti-circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #4ecdc4, #7fdbda);
+}
+
+.confetti-triangle {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 12px solid #45b7d1;
+}
+
+.confetti-star {
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(45deg, #f9ca24, #f39c12);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.confetti-diamond {
+  width: 10px;
+  height: 10px;
+  background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+  transform: rotate(45deg);
+}
+
+.confetti-heart {
+  width: 10px;
+  height: 10px;
+  background: linear-gradient(45deg, #ff9ff3, #f368e0);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+}
+
+@keyframes confettiExplode {
+  0% {
+    transform: translateX(0) translateY(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+}
+
+/* Animation classes */
+.animate-bounce-in {
+  animation: bounceIn 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-enticing-shake {
+  animation: enticingShake 3s ease-in-out infinite;
+}
+
+.animate-hand-fade-in {
+  animation: handFadeIn 0.8s ease-out forwards;
+}
+
+.animate-hand-hover {
+  animation: handHover 3s ease-in-out infinite;
+}
+
+.animate-hand-shake {
+  animation: handShake 0.8s ease-in-out infinite;
+}
+
+.animate-sheen-sweep {
+  animation: sheenSweep 0.6s ease-out forwards;
+}
+
+.animate-final-explosion {
+  animation: finalExplosion 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.animate-white-transition {
+  animation: whiteTransition 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.animate-counter-pop {
+  animation: counterPop 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+.animate-number-pulse {
+  animation: numberPulse 0.1s ease-out;
+}
+
+.animate-impact-ring {
+  animation: impactRing 0.6s ease-out forwards;
+}
+
+.animate-screen-shake {
+  animation: screenShake 0.5s ease-out;
+}
+
+.animate-screen-flash {
+  animation: screenFlash 0.3s ease-out;
+}
+
+.animate-explode {
+  animation: explode 0.8s ease-out forwards;
+}
+
+.animate-robux-reveal {
+  animation: robuxReveal 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+.animate-celebration-pulse {
+  animation: celebrationPulse 1.5s ease-in-out infinite;
+}
+
+.hidden {
+  display: none;
+}

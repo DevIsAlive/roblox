@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Present Opening Animation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="present" id="present">
+            <div class="glow-wrapper"></div>
+            <img src="./images/present.png" alt="Present">
+            <div class="sheen-overlay" id="sheenOverlay"></div>
+        </div>
+        
+        <div class="hand" id="hand">
+            <img src="./images/hand.png" alt="Hand">
+        </div>
+        
+        <div class="robux hidden" id="robux">
+            <img src="./images/robux-icon.png" alt="Robux">
+        </div>
+
+        <div class="robux-counter" id="robuxCounter">
+            <div class="robux-icon">
+                <img src="./images/robux-icon.png" alt="Robux Icon">
+            </div>
+            <div class="counter-text" id="counterText">0</div>
+        </div>
+    </div>
+
+    <div class="screen-flash" id="screenFlash"></div>
+    <div class="white-transition" id="whiteTransition"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
