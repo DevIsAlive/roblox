@@ -308,7 +308,7 @@ function renderSlotMachine(suggestions) {
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
     
     // Different offset for mobile vs desktop
-    const offset = isMobile ? 4 : 3;
+    const offset = isMobile ? 2 : 3;
     const targetPosition = (preRollCount - offset) * itemWidth;
     
     // Reset any existing transform
