@@ -31,13 +31,15 @@ body {
   position: relative;
   z-index: 10;
   overflow: visible; /* Allow glow to extend beyond */
+  opacity: 0; /* Start invisible to prevent flash */
+  visibility: hidden; /* New: Hidden by default */
 }
 
 .present img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  transition: filter 0.3s ease;
+  object-fit: contain; /* Corrected position */
+  transition: filter 0.3s ease; /* Corrected position */
 }
 
 .present:hover {
