@@ -302,36 +302,63 @@ function renderSlotMachine(suggestions) {
   setTimeout(() => {
     // Remove continuous spinning
     carouselTrack.classList.remove('spinning-continuous');
-    
-    // Calculate the target position based on device
-    const itemWidth = 150; // Width of each item
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    
-    // Different offset for mobile vs desktop
-    const offset = isMobile ? 2 : 3;
-    const targetPosition = (preRollCount - offset) * itemWidth;
-    
-    // Reset any existing transform
-    carouselTrack.style.transform = 'translateX(0)';
-    
-    // Force a reflow
-    void carouselTrack.offsetWidth;
-    
-    // Add landing animation
-    carouselTrack.classList.add('spinning-land');
-    
-    // Set the final position immediately
-    carouselTrack.style.transform = `translateX(-${targetPosition}px)`;
 
-    // Add an event listener to lock the final position
-    const onAnimationEnd = () => {
-      carouselTrack.classList.remove('spinning-land');
-      carouselTrack.removeEventListener('animationend', onAnimationEnd);
-      carouselTrack.classList.add('winner-glow');
-      targetItem.addEventListener('click', () => selectSuggestion(targetSuggestion));
-    };
+    // Get references to elements needed for dynamic centering
+    const carouselWindow = suggestionsDiv.querySelector('.carousel-window');
+    const targetItemElement = carouselTrack.querySelector('.item.winner');
 
-    carouselTrack.addEventListener('animationend', onAnimationEnd);
+    if (carouselWindow && targetItemElement) {
+      const targetItemOffsetLeft = targetItemElement.offsetLeft;
+      const targetItemWidth = targetItemElement.offsetWidth;
+      const carouselWindowWidth = carouselWindow.offsetWidth;
+
+      // Calculate the center of the target item relative to the carousel track's start
+      const targetItemCenterInTrack = targetItemOffsetLeft + (targetItemWidth / 2);
+
+      // Calculate the center of the visible carousel window
+      const carouselWindowCenter = carouselWindowWidth / 2;
+
+      // Calculate the transform needed to bring the target item's center to the window's center
+      let finalTranslateX = targetItemCenterInTrack - carouselWindowCenter;
+
+      // Removed empirical mobile adjustment to diagnose base calculation
+      // const isMobile = window.matchMedia('(max-width: 768px)').matches;
+      // if (isMobile) {
+      //   finalTranslateX -= 50; // Adjusted for mobile: shifted back to the right
+      // }
+
+      console.log('--- Carousel Debug Info ---');
+      console.log('targetItemOffsetLeft:', targetItemOffsetLeft);
+      console.log('targetItemWidth:', targetItemWidth);
+      console.log('carouselWindowWidth:', carouselWindowWidth);
+      console.log('targetItemCenterInTrack:', targetItemCenterInTrack);
+      console.log('carouselWindowCenter:', carouselWindowCenter);
+      console.log('Final calculated TranslateX:', finalTranslateX);
+      console.log('-------------------------');
+
+      // Set the final transform directly before adding the animation class
+      carouselTrack.style.transform = `translateX(-${finalTranslateX}px)`;
+
+      // Force a reflow to apply the transform before the animation class is added
+      void carouselTrack.offsetWidth;
+
+      // Add landing animation
+      carouselTrack.classList.add('spinning-land');
+
+      // Add an event listener to lock the final position
+      const onAnimationEnd = () => {
+        carouselTrack.classList.remove('spinning-land');
+        carouselTrack.removeEventListener('animationend', onAnimationEnd);
+        carouselTrack.classList.add('winner-glow');
+        targetItemElement.addEventListener('click', () => selectSuggestion(targetSuggestion));
+      };
+
+      carouselTrack.addEventListener('animationend', onAnimationEnd);
+    } else {
+      console.error("Could not find carouselWindow or targetItem for precise landing. Landing may be off.");
+      // Fallback: Just stop spinning if elements not found, don't attempt precise landing.
+      carouselTrack.classList.remove('spinning-continuous');
+    }
   }, 500); // Short delay before landing
 }
 
