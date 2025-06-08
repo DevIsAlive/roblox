@@ -12,26 +12,44 @@ let currentProfileValue = 400000; // Initial value 400,000
 let lastTopUpValue = 400000; // Track value at last top-up
 
 function updateProfileValue(amount) {
-  currentProfileValue = Math.max(0, currentProfileValue - amount); // Ensure value doesn't go below 0
-  profileValueSpan.textContent = currentProfileValue.toLocaleString(); // Format with commas
-  profileValueSpan.setAttribute('data-text', currentProfileValue.toLocaleString()); // Update data-text for shadow
-
-  // Remove existing pulsing classes
-  profileValueSpan.classList.remove('pulse-subtle', 'pulse-medium', 'pulse-strong');
-
-  // Apply pulsing based on value
-  if (currentProfileValue < 10000) {
-    profileValueSpan.classList.add('pulse-strong');
-  } else if (currentProfileValue < 50000) {
-    profileValueSpan.classList.add('pulse-medium');
-  } else if (currentProfileValue < 100000) {
-    profileValueSpan.classList.add('pulse-subtle');
+  currentProfileValue = Math.max(0, currentProfileValue - amount);
+  
+  // Add number rolling animation
+  const startValue = parseInt(profileValueSpan.textContent.replace(/,/g, ''));
+  const endValue = currentProfileValue;
+  const duration = 1000;
+  const startTime = performance.now();
+  
+  function updateNumber(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    
+    // Easing function for smooth animation
+    const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+    const currentValue = Math.floor(startValue + (endValue - startValue) * easeOutQuart);
+    
+    profileValueSpan.textContent = currentValue.toLocaleString();
+    profileValueSpan.setAttribute('data-text', currentValue.toLocaleString());
+    
+    if (progress < 1) {
+      requestAnimationFrame(updateNumber);
+    }
   }
-
-  // Check for top-up condition: if current value drops below 10,000
+  
+  requestAnimationFrame(updateNumber);
+  
+  // Add visual feedback
+  profileValueSpan.classList.add('pulse-strong');
+  setTimeout(() => {
+    profileValueSpan.classList.remove('pulse-strong');
+  }, 1000);
+  
+  // Trigger haptic feedback
+  triggerHapticFeedback();
+  
+  // Check for top-up condition
   if (currentProfileValue < 10000) {
     topUpProfileValue();
-    // No need to reset lastTopUpValue here, as the condition is based on absolute value
   }
 }
 
@@ -626,11 +644,25 @@ function showNotification(message, type = "info") {
   }
 
   const notification = document.createElement("div");
-  notification.className = `notification ${type}`;
+  notification.className = `notification-pill ${type}`;
+  
+  // Add sparkle effect for premium notifications
+  if (type === "premium") {
+    const sparkle = document.createElement("div");
+    sparkle.className = "sparkle";
+    notification.appendChild(sparkle);
+  }
+  
   notification.textContent = message;
   notificationsContainer.appendChild(notification);
 
-  // Remove after 3 seconds
+  // Add entrance animation
+  notification.style.animation = 'fadeInNotification 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+  
+  // Trigger haptic feedback
+  triggerHapticFeedback();
+
+  // Remove after 3 seconds with enhanced exit animation
   setTimeout(() => {
     notification.classList.add("fade-out");
     setTimeout(() => {
@@ -639,19 +671,33 @@ function showNotification(message, type = "info") {
   }, 3000);
 }
 
-// Add input event listener to handle movement
+// Add haptic feedback if available
+function triggerHapticFeedback() {
+  if (window.navigator && window.navigator.vibrate) {
+    window.navigator.vibrate(50);
+  }
+}
+
+// Enhanced input handling with more feedback
 input.addEventListener("input", (e) => {
   const isMobile = window.innerWidth <= 768;
   const inputContainer = document.querySelector('.input-container');
   
+  // Trigger haptic feedback on input
+  triggerHapticFeedback();
+  
   if (e.target.value.length > 0) {
     if (!isMobile) {
-      // Only move the input container on desktop
       inputContainer.classList.add("has-text");
     } else {
-      // On mobile, ensure it stays in place
       inputContainer.classList.remove("has-text");
     }
+    
+    // Add subtle scale effect to input
+    input.style.transform = 'scale(1.02)';
+    setTimeout(() => {
+      input.style.transform = 'scale(1)';
+    }, 150);
   } else {
     inputContainer.classList.remove("has-text");
   }
