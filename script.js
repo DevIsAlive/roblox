@@ -638,3 +638,28 @@ function showNotification(message, type = "info") {
     }, 300);
   }, 3000);
 }
+
+// Add input event listener to handle movement
+input.addEventListener("input", (e) => {
+  const isMobile = window.innerWidth <= 768;
+  if (e.target.value.length > 0) {
+    if (!isMobile) {
+      // Only move the input container on desktop
+      inputContainer.classList.add("has-text");
+    }
+  } else {
+    inputContainer.classList.remove("has-text");
+  }
+});
+
+// Add resize event listener to handle window resizing
+window.addEventListener("resize", () => {
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    // Remove the movement class if we're on mobile
+    inputContainer.classList.remove("has-text");
+  } else if (input.value.length > 0) {
+    // Add it back if we're on desktop and there's text
+    inputContainer.classList.add("has-text");
+  }
+});
