@@ -642,10 +642,15 @@ function showNotification(message, type = "info") {
 // Add input event listener to handle movement
 input.addEventListener("input", (e) => {
   const isMobile = window.innerWidth <= 768;
+  const inputContainer = document.querySelector('.input-container');
+  
   if (e.target.value.length > 0) {
     if (!isMobile) {
       // Only move the input container on desktop
       inputContainer.classList.add("has-text");
+    } else {
+      // On mobile, ensure it stays in place
+      inputContainer.classList.remove("has-text");
     }
   } else {
     inputContainer.classList.remove("has-text");
@@ -655,6 +660,8 @@ input.addEventListener("input", (e) => {
 // Add resize event listener to handle window resizing
 window.addEventListener("resize", () => {
   const isMobile = window.innerWidth <= 768;
+  const inputContainer = document.querySelector('.input-container');
+  
   if (isMobile) {
     // Remove the movement class if we're on mobile
     inputContainer.classList.remove("has-text");

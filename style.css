@@ -889,7 +889,7 @@ button:hover {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) !important; /* Force the transform to stay centered */
     width: 90%;
     max-width: 300px;
   }
@@ -900,9 +900,9 @@ button:hover {
     z-index: 1001;
   }
 
-  /* Prevent movement on mobile */
+  /* Prevent movement on mobile - override any other transforms */
   .input-container.has-text {
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) !important;
   }
 }
 
