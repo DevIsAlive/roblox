@@ -100,19 +100,113 @@ function getRandomHeadshot() {
   return allHeadshotImages[Math.floor(Math.random() * allHeadshotImages.length)];
 }
 
-input.addEventListener('focus', () => {
+// Add state tracking for notifications
+let hasStartedTyping = false;
+let hasFocusedInput = false;
+
+// Enhanced notification system with dynamic caps
+function showNotification(message, type = "info") {
+  let maxNotifications;
+  
+  if (hasStartedTyping) {
+    maxNotifications = 1; // Cap at 1 after typing
+  } else if (hasFocusedInput) {
+    maxNotifications = 1; // Cap at 1 after focusing
+  } else {
+    maxNotifications = 3; // Cap at 3 before any interaction
+  }
+
+  // Remove oldest notification if we're at the cap
+  if (notificationsContainer.children.length >= maxNotifications) {
+    const oldestNotification = notificationsContainer.children[0];
+    oldestNotification.classList.add('fade-out');
+    setTimeout(() => {
+      oldestNotification.remove();
+    }, 300);
+  }
+
+  const notification = document.createElement("div");
+  notification.className = `notification-pill ${type}`;
+  
+  // Add sparkle effect for premium notifications
+  if (type === "premium") {
+    const sparkle = document.createElement("div");
+    sparkle.className = "sparkle";
+    notification.appendChild(sparkle);
+  }
+  
+  notification.textContent = message;
+  notificationsContainer.appendChild(notification);
+
+  // Add entrance animation
+  notification.style.animation = 'fadeInNotification 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+  
+  // Trigger haptic feedback
+  triggerHapticFeedback();
+
+  // Remove after 3 seconds with enhanced exit animation
+  setTimeout(() => {
+    notification.classList.add("fade-out");
+    setTimeout(() => {
+      notification.remove();
+    }, 300);
+  }, 3000);
+}
+
+// Update input event listeners
+input.addEventListener("focus", () => {
+  hasFocusedInput = true;
   handPoint.classList.add('hidden');
-  // Remove top notifications on focus
+  
+  // Remove excess notifications when focusing
   const currentNotifications = notificationsContainer.children;
-  if (currentNotifications.length > 2) {
-    for (let i = 0; i < currentNotifications.length - 2; i++) {
+  if (currentNotifications.length > 1) {
+    for (let i = 0; i < currentNotifications.length - 1; i++) {
       const notificationToRemove = currentNotifications[i];
       notificationToRemove.classList.add('fade-out');
       notificationToRemove.addEventListener('animationend', () => {
         notificationToRemove.remove();
-        updateNotificationPositions(); // Reposition remaining notifications
+        updateNotificationPositions();
       }, { once: true });
     }
+  }
+});
+
+input.addEventListener("input", (e) => {
+  hasStartedTyping = true;
+  const isMobile = window.innerWidth <= 768;
+  const inputContainer = document.querySelector('.input-container');
+  
+  // Trigger haptic feedback on input
+  triggerHapticFeedback();
+  
+  // Remove excess notifications when typing
+  const currentNotifications = notificationsContainer.children;
+  if (currentNotifications.length > 1) {
+    for (let i = 0; i < currentNotifications.length - 1; i++) {
+      const notificationToRemove = currentNotifications[i];
+      notificationToRemove.classList.add('fade-out');
+      notificationToRemove.addEventListener('animationend', () => {
+        notificationToRemove.remove();
+        updateNotificationPositions();
+      }, { once: true });
+    }
+  }
+  
+  if (e.target.value.length > 0) {
+    if (!isMobile) {
+      inputContainer.classList.add("has-text");
+    } else {
+      inputContainer.classList.remove("has-text");
+    }
+    
+    // Add subtle scale effect to input
+    input.style.transform = 'scale(1.02)';
+    setTimeout(() => {
+      input.style.transform = 'scale(1)';
+    }, 150);
+  } else {
+    inputContainer.classList.remove("has-text");
   }
 });
 
@@ -639,75 +733,12 @@ loadUsernames().then(() => {
   setInterval(addNotification, 1500);
 });
 
-function showNotification(message, type = "info") {
-  // Remove oldest notification if we have 4
-  if (notificationsContainer.children.length >= 4) {
-    const oldestNotification = notificationsContainer.children[0];
-    oldestNotification.classList.add('fade-out');
-    setTimeout(() => {
-      oldestNotification.remove();
-    }, 300);
-  }
-
-  const notification = document.createElement("div");
-  notification.className = `notification-pill ${type}`;
-  
-  // Add sparkle effect for premium notifications
-  if (type === "premium") {
-    const sparkle = document.createElement("div");
-    sparkle.className = "sparkle";
-    notification.appendChild(sparkle);
-  }
-  
-  notification.textContent = message;
-  notificationsContainer.appendChild(notification);
-
-  // Add entrance animation
-  notification.style.animation = 'fadeInNotification 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
-  
-  // Trigger haptic feedback
-  triggerHapticFeedback();
-
-  // Remove after 3 seconds with enhanced exit animation
-  setTimeout(() => {
-    notification.classList.add("fade-out");
-    setTimeout(() => {
-      notification.remove();
-    }, 300);
-  }, 3000);
-}
-
 // Add haptic feedback if available
 function triggerHapticFeedback() {
   if (window.navigator && window.navigator.vibrate) {
     window.navigator.vibrate(50);
   }
 }
-
-// Enhanced input handling with more feedback
-input.addEventListener("input", (e) => {
-  const isMobile = window.innerWidth <= 768;
-  const inputContainer = document.querySelector('.input-container');
-  
-  // Trigger haptic feedback on input
-  triggerHapticFeedback();
-  
-  if (e.target.value.length > 0) {
-    if (!isMobile) {
-      inputContainer.classList.add("has-text");
-    } else {
-      inputContainer.classList.remove("has-text");
-    }
-    
-    // Add subtle scale effect to input
-    input.style.transform = 'scale(1.02)';
-    setTimeout(() => {
-      input.style.transform = 'scale(1)';
-    }, 150);
-  } else {
-    inputContainer.classList.remove("has-text");
-  }
-});
 
 // Add resize event listener to handle window resizing
 window.addEventListener("resize", () => {
