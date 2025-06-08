@@ -101,23 +101,14 @@ function getRandomHeadshot() {
 }
 
 // Add state tracking for notifications
-let hasStartedTyping = false;
-let hasFocusedInput = false;
+let hasInteractedWithInput = false;
 
-// Enhanced notification system with dynamic caps
+// Enhanced notification system with strict caps
 function showNotification(message, type = "info") {
-  let maxNotifications;
-  
-  if (hasStartedTyping) {
-    maxNotifications = 1; // Cap at 1 after typing
-  } else if (hasFocusedInput) {
-    maxNotifications = 1; // Cap at 1 after focusing
-  } else {
-    maxNotifications = 3; // Cap at 3 before any interaction
-  }
+  const maxNotifications = hasInteractedWithInput ? 1 : 3;
 
   // Remove oldest notification if we're at the cap
-  if (notificationsContainer.children.length >= maxNotifications) {
+  while (notificationsContainer.children.length >= maxNotifications) {
     const oldestNotification = notificationsContainer.children[0];
     oldestNotification.classList.add('fade-out');
     setTimeout(() => {
@@ -153,45 +144,41 @@ function showNotification(message, type = "info") {
   }, 3000);
 }
 
+// Function to enforce notification cap
+function enforceNotificationCap() {
+  const maxNotifications = hasInteractedWithInput ? 1 : 3;
+  
+  while (notificationsContainer.children.length > maxNotifications) {
+    const oldestNotification = notificationsContainer.children[0];
+    oldestNotification.classList.add('fade-out');
+    setTimeout(() => {
+      oldestNotification.remove();
+    }, 300);
+  }
+}
+
 // Update input event listeners
 input.addEventListener("focus", () => {
-  hasFocusedInput = true;
+  hasInteractedWithInput = true;
   handPoint.classList.add('hidden');
-  
-  // Remove excess notifications when focusing
-  const currentNotifications = notificationsContainer.children;
-  if (currentNotifications.length > 1) {
-    for (let i = 0; i < currentNotifications.length - 1; i++) {
-      const notificationToRemove = currentNotifications[i];
-      notificationToRemove.classList.add('fade-out');
-      notificationToRemove.addEventListener('animationend', () => {
-        notificationToRemove.remove();
-        updateNotificationPositions();
-      }, { once: true });
-    }
-  }
+  enforceNotificationCap();
+});
+
+input.addEventListener("click", () => {
+  hasInteractedWithInput = true;
+  enforceNotificationCap();
 });
 
 input.addEventListener("input", (e) => {
-  hasStartedTyping = true;
+  hasInteractedWithInput = true;
   const isMobile = window.innerWidth <= 768;
   const inputContainer = document.querySelector('.input-container');
   
   // Trigger haptic feedback on input
   triggerHapticFeedback();
   
-  // Remove excess notifications when typing
-  const currentNotifications = notificationsContainer.children;
-  if (currentNotifications.length > 1) {
-    for (let i = 0; i < currentNotifications.length - 1; i++) {
-      const notificationToRemove = currentNotifications[i];
-      notificationToRemove.classList.add('fade-out');
-      notificationToRemove.addEventListener('animationend', () => {
-        notificationToRemove.remove();
-        updateNotificationPositions();
-      }, { once: true });
-    }
-  }
+  // Enforce notification cap
+  enforceNotificationCap();
   
   if (e.target.value.length > 0) {
     if (!isMobile) {
